@@ -260,7 +260,7 @@ melt_reports(report, "peak_stats")
 #>                     Sample PeakCount PeakGenomeCov    FRIP
 #> 1 SRR26098097.Chr4MtPt.bam      4557         0.127 0.01357
 ```
-(Not that for illustrative purposes, I am using a partial peak set from
+(Note that for illustrative purposes, I am using a partial peak set from
 a previous project where I performed ATAC-seq during germination;
 thus most of the peaks in this particular mesophyll sample are different,
 leading to the very low FRIP score.)
@@ -310,7 +310,7 @@ ggplot(frag.hist, aes(FragSize, Count)) +
 Now we can see the clear nucleosome-free peak below ~125 bp in the plot.
 There is a bit of a hump around 150-200 bp, perhaps indicative of 
 mononucleosomal fragments, though in case it is not very distinct; 
-in my experience this can be vary variable between samples. 
+in my experience this can be very variable between samples. 
 
 To see the effect that the presence of nucleosomes has on transposition,
 we can compare with the distribution from chloroplastic reads. To do this,
@@ -439,8 +439,8 @@ report.filt <- quaqc(bam, peaks = peaks, tss = tss, blacklist = blacklist,
   target.names = c("4", "Mt", "Pt"), tss.tn5 = TRUE, strict = TRUE, v = 0)
 #> quaqc --json - --target-names 4,Mt,Pt --no-output --strict --tss-tn5 --blacklist /Users/ben/quaqcr/inst/extdata/bl.bed.gz --tss /Users/ben/quaqcr/inst/extdata/tss.bed.gz --peaks /Users/ben/quaqcr/inst/extdata/peaks.bed.gz SRR26098097.Chr4MtPt.bam
 report.all <- quaqc(bam, peaks = peaks, tss = tss, blacklist = blacklist,
-#> quaqc --json - --target-names 4,Mt,Pt --no-output --tss-tn5 --use-all --blacklist /Users/ben/quaqcr/inst/extdata/bl.bed.gz --tss /Users/ben/quaqcr/inst/extdata/tss.bed.gz --peaks /Users/ben/quaqcr/inst/extdata/peaks.bed.gz SRR26098097.Chr4MtPt.bam
   target.names = c("4", "Mt", "Pt"), tss.tn5 = TRUE, use.all = TRUE, v = 0)
+#> quaqc --json - --target-names 4,Mt,Pt --no-output --tss-tn5 --use-all --blacklist /Users/ben/quaqcr/inst/extdata/bl.bed.gz --tss /Users/ben/quaqcr/inst/extdata/tss.bed.gz --peaks /Users/ben/quaqcr/inst/extdata/peaks.bed.gz SRR26098097.Chr4MtPt.bam
 tss.pileup.filt <- melt_reports(report.filt, "tss_pileup", normalize.tss = "bkg")
 tss.pileup.all <- melt_reports(report.all, "tss_pileup", normalize.tss = "bkg")
 tss.pileup.filt$Sample <- "Filtered"
@@ -559,7 +559,7 @@ resizing them from the point of insertion:
 ```R
 peak1.filt <- pileup(peak1, bam, qlen = 100, region.size = 5001,
   strict = TRUE, target.names = "4", tss.tn5 = TRUE)
-#> quaqc -v --tss-qlen 100 --tss-size 5001 --json - --target-names 4 --no-output --strict --fast --tss-tn5 --tss /Users/ben/quaqcr/inst/extdata/peak1.bed.gz SRR26098097.Chr4MtPt.bam
+#> quaqc --tss-qlen 100 --tss-size 5001 --json - --target-names 4 --no-output --strict --fast --tss-tn5 --tss /Users/ben/quaqcr/inst/extdata/peak1.bed.gz SRR26098097.Chr4MtPt.bam
 ggplot(peak1.filt, aes(Position, Signal)) +
   geom_line() +
   ylab("RPM") +
