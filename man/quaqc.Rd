@@ -13,11 +13,12 @@ quaqc(bam.files, mitochondria = NULL, plastids = NULL, peaks = NULL,
   max.flen = NULL, use.all = FALSE, max.depth = NULL, max.qhist = NULL,
   max.fhist = NULL, tss.size = NULL, tss.qlen = NULL, tss.tn5 = FALSE,
   omit.gc = FALSE, omit.depth = FALSE, fast = FALSE, lenient = FALSE,
-  nfr = FALSE, nbr = FALSE, footprint = FALSE, chip = FALSE,
-  output.dir = NULL, output.ext = NULL, no.output = TRUE, json = "-",
-  keep = FALSE, keep.dir = NULL, keep.ext = NULL, threads = NULL,
-  title = NULL, continue = FALSE, verbose = 1, timeout = 0,
-  env = character(), stderr.file = "", bin = getOption("quaqc.bin"))
+  strict = FALSE, nfr = FALSE, nbr = FALSE, footprint = FALSE,
+  chip = FALSE, output.dir = NULL, output.ext = NULL, no.output = TRUE,
+  json = "-", keep = FALSE, keep.dir = NULL, keep.ext = NULL,
+  threads = NULL, title = NULL, continue = FALSE, verbose = 1,
+  timeout = 0, env = character(), stderr.file = "",
+  bin = getOption("quaqc.bin"))
 }
 \arguments{
 \item{bam.files}{Character vector of BAM file names. Must be coordinate
@@ -96,6 +97,8 @@ properly.}
 
 \item{lenient}{Logical, turn on lenient mode.}
 
+\item{strict}{Logical, turn on strict mode.}
+
 \item{nfr}{Logical, turn on NFR mode.}
 
 \item{nbr}{Logical, turn on NBR mode.}
@@ -165,7 +168,7 @@ quaqc()
 
 }
 \seealso{
-\code{\link[base:system2]{base::system2()}}
+\code{\link[base:system2]{base::system2()}}, \code{\link[=parse_quaqc]{parse_quaqc()}}, \code{\link[=parse_quaqc_file]{parse_quaqc_file()}}
 }
 \author{
 Benjamin Jean-Marie Tremblay, \email{benjmtremblay@gmail.com}

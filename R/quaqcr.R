@@ -8,5 +8,7 @@
 #' @aliases quaqcr-pkg
 #'
 #' @importFrom jsonlite fromJSON
+#' @importFrom methods is
+#' @importFrom utils write.table
 NULL
 

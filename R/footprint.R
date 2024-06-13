@@ -12,23 +12,32 @@
 #' @param bkg.motifs Either (1) a filename of a BED file containing
 #' target motif positions, or (2) a `GRanges` object from the
 #' \pkg{GenomicRanges} package. (Optional.)
-#' @param normalize Converts read density into values
+#' @param normalize "bkg": Converts read density into values
 #' relative to the background (the first 25% of the window).
+#' "rpm": Conver to reads per million. "no": Return as the average
+#' number of reads per window.
 #' @param ... See [quaqc()].
 #'
 #' @return A `data.frame` containing read pileup data.
 #'
+#' @examples
+#' \dontrun{
+#' TATA_peaks <- system.file("extdata", "tata_p.bed.gz", package = "quaqcr")
+#' TATA_bkg <- system.file("extdata", "tata_n.bed.gz", package = "quaqcr")
+#' footprint(TATA_peaks, "Sample.bam", bkg.motifs = TATA_bkg)
+#' }
+#'
 #' @author Benjamin Jean-Marie Tremblay, \email{benjmtremblay@@gmail.com}
-#' @seealso [base::system2()], [quaqcr::quaqc()]
+#' @seealso [quaqcr::quaqc()], [quaqcr::melt_reports()]
 #' @inheritParams quaqc
 #' @export
 footprint <- function(target.motifs, bam.files, bkg.motifs = NULL,
-  normalize = c("bkg", "rpm", "no"), tss.size = 501, tss.qlen = 1, tss.tn5 = TRUE,
-  nfr = TRUE, verbose = 0, ...) {
+  normalize = c("bkg", "rpm", "no"), tss.size = 501, tss.qlen = 1,
+  tss.tn5 = TRUE, nfr = TRUE, verbose = 0, ...) {
 
   normalize <- match.arg(normalize)
   args <- list(...)
-  if ("json" %in% names(args) && is.null(json)) stop("'json' cannot be NULL")
+  if ("json" %in% names(args) && is.null(args$json)) stop("'json' cannot be NULL")
   if ("tss" %in% names(args)) warning("'tss' cannot be set")
 
   target <- quaqc(bam.files = bam.files, tss.size = tss.size, tss.qlen = tss.qlen,
@@ -47,8 +56,6 @@ footprint <- function(target.motifs, bam.files, bkg.motifs = NULL,
     bkg.pileup$Region <- "Background"
     target.pileup <- rbind(target.pileup, bkg.pileup)
   }
-
-  # TODO: divide the pileup values by the number of total reads?
 
   colnames(target.pileup) <- c("Sample", "Distance", "Frequency", "Target")
 

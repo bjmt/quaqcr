@@ -9,20 +9,48 @@
 #' @return A \code{quaqc}-class object.
 #'
 #' @details
+#'
+#' A \code{quaqc} object is a higher level format encompassing the
+#' quaqc run parameters (accessible via `$metadata`) and the actual
+#' individual reports for each sample (accessible via `$reports`). The
+#' reports are themselves \code{quaqc_report}-class objects with
+#' multiple list slots, including:
+#'
+#' * `$sample`: The filename of the sample.
+#' * `$success`: Whether the sample was successfully analyzed.
+#' * `$params`: Values for all quaqc parameters used to analyze this sample.
+#' * `$genome`: Data about the genome taken from the BAM header.
+#' * `$unfiltered`: Basic stats about the total number of reads before filtering.
+#' * `$filtered`: Contains the majority of the data output by quaqc.
+#'
+#' This final `$filtered` slot itself is broken down into several sub-lists:
+#'
+#' * `$overview`: Average values for several stats such as fragment size.
+#' * `$nuclear$stats`: Further breakdown of the previous stats for nuclear reads.
+#' * `$nuclear$stats.warn`: Whether any quaqc parameters prevented it from accurately collecting some data.
+#' * `$nuclear$addn.stats`: Genome coverage and the number of alignments without a MAPQ score.
+#' * `$nuclear$histograms`: Raw histogram data for alignment size, fragment size, GC percent, and read depth.
+#' * `$nuclear$peaks`: The number of peaks, the fraction of the effective genome covered by them, and the FRIP score.
+#' * `$nuclear$tss`: The read pileup around TSSs as well as the TSS enrichment score.
 #' 
 #' Note that the word 'effective' refers to reads which are visible to
 #' quaqc within target regions or outside blacklisted regions, as well
 #' as reads associated with any specified target read groups. 
 #'
 #' @examples
-#' \dontrun{
-#' f <- gzfile("report.json.gz", "rt")
-#' json <- jsonlite::fromJSON(readLines(f))
+#' report.file <- system.file("extdata", "report.json.gz", package = "quaqcr")
+#'
+#' ## Option 1: parse a report already read into R
+#' f <- gzfile(report.file, "rt")
+#' json <- jsonlite::fromJSON(readLines(f), simplifyDataFrame = FALSE)
 #' close(f)
 #' report <- parse_quaqc(json)
-#' }
+#'
+#' ## Option 2: parse a report directly from a file
+#' report <- parse_quaqc_file(report.file)
 #'
 #' @author Benjamin Jean-Marie Tremblay, \email{benjmtremblay@@gmail.com}
+#' @seealso [quaqcr::quaqc()]
 #' @rdname parse_quaqc
 #' @export
 parse_quaqc <- function(json.text) {
@@ -57,6 +85,7 @@ parse_quaqc <- function(json.text) {
 }
 
 #' @rdname parse_quaqc
+#' @export
 parse_quaqc_file <- function(json.file) {
   json <- json.file
   if (!is.character(json) && length(json) != 1) {

@@ -93,7 +93,7 @@
 #' }
 #'
 #' @author Benjamin Jean-Marie Tremblay, \email{benjmtremblay@@gmail.com}
-#' @seealso [base::system2()]
+#' @seealso [base::system2()], [quaqcr::parse_quaqc()], [quaqcr::parse_quaqc_file()]
 #' @export
 quaqc <- function(bam.files, mitochondria = NULL, plastids = NULL, peaks = NULL,
   tss = NULL, target.names = NULL, target.list = NULL, blacklist = NULL,

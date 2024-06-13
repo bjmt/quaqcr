@@ -1,6 +1,6 @@
 Package: quaqcr
 Title: Quick ATAC-seq QC in R
-Version: 0.0.1
+Version: 1.0.0
 Authors@R: 
     person(c("Benjamin", "Jean-Marie"), "Tremblay", role = c("aut", "cre"),
       email = "benjmtremblay@gmail.com",
@@ -18,6 +18,6 @@ Description: A wrapper around the 'quaqc' program. 'quaqc' allows for
     results.
 License: GPL (>= 3)
 Encoding: UTF-8
-Imports: jsonlite
+Imports: methods, utils, jsonlite
 Roxygen: list(markdown = TRUE, old_usage = TRUE)
 RoxygenNote: 7.2.3

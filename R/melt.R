@@ -1,4 +1,34 @@
-
+#' Melt sections of a quaqc report into a data.frame.
+#' 
+#' The quaqc report class type in R is divided into lists of lists,
+#' which can require additional manipulation. This function will
+#' "melt" these individual sections into \code{data.frame} objects.
+#'
+#' @param report A \code{quaqc} object.
+#' @param section The \code{quaqc} object subsection to melt.
+#' @param use.basename Whether to use the [base::basename()] function
+#' on the sample names.
+#' @param normalize.tss How to normalize the TSS pileup. "no": Keep
+#' the signal as the average number of reads per window. "bkg":
+#' Calculate the signal relative to the background (the first 25%
+#' of the window). "rpm": Convert to reads per million.
+#' @param normalize.hist How to normalize the alignment size,
+#' fragment size, GC percent, and read depth histograms.
+#' "no": Keep as the total number of reads per bin. "proportion":
+#' Divide by the sum of reads across all windows. "max": Divide
+#' by the max bin count.
+#'
+#' @return A \code{data.frame} with varying columns based on the
+#' section being melted.
+#'
+#' @examples
+#' report.file <- system.file("extdata", "report.json.gz", package = "quaqcr")
+#' report <- parse_quaqc_file(report.file)
+#' melt_reports(report, "overview_filt")
+#'
+#' @author Benjamin Jean-Marie Tremblay, \email{benjmtremblay@@gmail.com}
+#' @seealso [quaqcr::quaqc()], [quaqcr::parse_quaqc_file()]
+#' @export
 melt_reports <- function(report, section = c("bam_stats",
     "overview_unfilt", "overview_filt", "nucl_stats", "nucl_addn",
     "peak_stats", "tss_stats", "tss_pileup", "aln_hist", "frag_hist", "gc_hist",

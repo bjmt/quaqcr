@@ -4,20 +4,26 @@
 \alias{footprint}
 \title{Get transcription factor footprints with quaqc.}
 \usage{
-footprint(target.motifs, bkg.motifs = NULL, bam.files, tss.size = 501,
-  tss.qlen = 1, tss.tn5 = TRUE, fast = TRUE, nfr = TRUE, ...)
+footprint(target.motifs, bam.files, bkg.motifs = NULL, normalize = c("bkg",
+  "rpm", "no"), tss.size = 501, tss.qlen = 1, tss.tn5 = TRUE,
+  nfr = TRUE, verbose = 0, ...)
 }
 \arguments{
 \item{target.motifs}{Either (1) a filename of a BED file containing
 target motif positions, or (2) a \code{GRanges} object from the
 \pkg{GenomicRanges} package.}
 
+\item{bam.files}{Character vector of BAM file names. Must be coordinate
+sorted. If no index file can be found, \code{quaqc} will generate them.}
+
 \item{bkg.motifs}{Either (1) a filename of a BED file containing
 target motif positions, or (2) a \code{GRanges} object from the
 \pkg{GenomicRanges} package. (Optional.)}
 
-\item{bam.files}{Character vector of BAM file names. Must be coordinate
-sorted. If no index file can be found, \code{quaqc} will generate them.}
+\item{normalize}{"bkg": Converts read density into values
+relative to the background (the first 25\% of the window).
+"rpm": Conver to reads per million. "no": Return as the average
+number of reads per window.}
 
 \item{tss.size}{Integer, size of the TSS region for pileup.}
 
@@ -25,15 +31,14 @@ sorted. If no index file can be found, \code{quaqc} will generate them.}
 
 \item{tss.tn5}{Logical, shift 5-prime end coordinates +4/-5 bases for pileup.}
 
-\item{fast}{Logical, turn on fast mode.}
-
 \item{nfr}{Logical, turn on NFR mode.}
+
+\item{verbose}{Integer, a value from 0 to 2 for the level of program verbosity.}
 
 \item{...}{See \code{\link[=quaqc]{quaqc()}}.}
 }
 \value{
-A list of length 2. The first entry contains a \code{data.frame} with
-the fooprint pileups, and the second entry contains the quaqc reports.
+A \code{data.frame} containing read pileup data.
 }
 \description{
 The TSS pileup feature of quaqc can instead be used to get single
@@ -42,8 +47,16 @@ This function provides a convenient wrapper around such
 functionality. Target regions can be compared to unbound or background
 regions. (Note that no Tn5 bias correction is applied.)
 }
+\examples{
+\dontrun{
+TATA_peaks <- system.file("extdata", "tata_p.bed.gz", package = "quaqcr")
+TATA_bkg <- system.file("extdata", "tata_n.bed.gz", package = "quaqcr")
+footprint(TATA_peaks, "Sample.bam", bkg.motifs = TATA_bkg)
+}
+
+}
 \seealso{
-\code{\link[base:system2]{base::system2()}}, \code{\link[=quaqc]{quaqc()}}
+\code{\link[=quaqc]{quaqc()}}, \code{\link[=melt_reports]{melt_reports()}}
 }
 \author{
 Benjamin Jean-Marie Tremblay, \email{benjmtremblay@gmail.com}
