@@ -127,7 +127,7 @@ parse_single_report <- function(report, params.nume, params.logi) {
     )
     filtered <- list(
       nuclear = overview.nuc,
-      mitochondria = unlist(report$filtered_read_stats$mitochondrial),
+      mitochondrial = unlist(report$filtered_read_stats$mitochondrial),
       plastidic = unlist(report$filtered_read_stats$plastidic)
     )
     nuclear.stats.names1 <- c("size_min", "size_1st_pctile", "size_average",
@@ -226,7 +226,7 @@ print.quaqc <- function(x, ...) {
   if (nmax > 3) println("    ...")
   println("To examine run data: $metadata")
   println("To examine reports:  $reports")
-  println("See ?parse_quaqc for ways to access QC data.")
+  println("See ?melt_reports or ?parse_quaqc for ways to access data.")
   invisible(x)
 }
 
@@ -243,8 +243,8 @@ print.quaqc_report <- function(x, ...) {
     println(
       "GC histo: ", if (!is.null(x$filtered$nuclear$histograms$gc)) "yes" else "no", ". ",
       "Depths histo: ", if (!is.null(x$filtered$nuclear$histograms$depth)) "yes" else "no", ". ",
-      "\nPeak stats: ", if (!is.null(x$filtered$nuclear$histograms$peaks)) "yes" else "no", ". ",
-      "TSS pileup: ", if (!is.null(x$filtered$nuclear$histograms$tss)) "yes" else "no", "."
+      "\nPeak stats: ", if (!is.null(x$filtered$nuclear$peaks)) "yes" else "no", ". ",
+      "TSS pileup: ", if (!is.null(x$filtered$nuclear$tss)) "yes" else "no", "."
     )
   }
   println("Available slots:")

@@ -50,6 +50,7 @@
 #' @param omit.depth Logical, omit calculation of read depths.
 #' @param fast Logical, turn on fast mode.
 #' @param lenient Logical, turn on lenient mode.
+#' @param strict Logical, turn on strict mode.
 #' @param nfr Logical, turn on NFR mode.
 #' @param nbr Logical, turn on NBR mode.
 #' @param footprint Logical, turn on footprinting mode.
@@ -101,7 +102,7 @@ quaqc <- function(bam.files, mitochondria = NULL, plastids = NULL, peaks = NULL,
   mapq = NULL, min.qlen = NULL, min.flen = NULL, max.qlen = NULL,
   max.flen = NULL, use.all = FALSE, max.depth = NULL, max.qhist = NULL,
   max.fhist = NULL, tss.size = NULL, tss.qlen = NULL, tss.tn5 = FALSE,
-  omit.gc = FALSE, omit.depth = FALSE, fast = FALSE, lenient = FALSE,
+  omit.gc = FALSE, omit.depth = FALSE, fast = FALSE, lenient = FALSE, strict = FALSE,
   nfr = FALSE, nbr = FALSE, footprint = FALSE, chip = FALSE, output.dir = NULL,
   output.ext = NULL, no.output = TRUE, json = "-", keep = FALSE,
   keep.dir = NULL, keep.ext = NULL, threads = NULL, title = NULL, continue = FALSE,
@@ -207,6 +208,7 @@ quaqc <- function(bam.files, mitochondria = NULL, plastids = NULL, peaks = NULL,
   if (omit.depth) args <- c("--omit-depth", args)
   if (fast) args <- c("--fast", args)
   if (lenient) args <- c("--lenient", args)
+  if (strict) args <- c("--strict", args)
   if (nfr) args <- c("--nfr", args)
   if (nbr) args <- c("--nbr", args)
   if (footprint) args <- c("--footprint", args)

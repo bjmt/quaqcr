@@ -12,6 +12,8 @@
 #' @param bkg.motifs Either (1) a filename of a BED file containing
 #' target motif positions, or (2) a `GRanges` object from the
 #' \pkg{GenomicRanges} package. (Optional.)
+#' @param normalize Converts read density into values
+#' relative to the background (the first 25% of the window).
 #' @param ... See [quaqc()].
 #'
 #' @return A `data.frame` containing read pileup data.
@@ -20,39 +22,37 @@
 #' @seealso [base::system2()], [quaqcr::quaqc()]
 #' @inheritParams quaqc
 #' @export
-footprint <- function(target.motifs, bam.files,
-  bkg.motifs = NULL, tss.size = 501, tss.qlen = 1, tss.tn5 = TRUE,
-  fast = TRUE, nfr = TRUE, verbose = 0, ...) {
+footprint <- function(target.motifs, bam.files, bkg.motifs = NULL,
+  normalize = c("bkg", "rpm", "no"), tss.size = 501, tss.qlen = 1, tss.tn5 = TRUE,
+  nfr = TRUE, verbose = 0, ...) {
 
+  normalize <- match.arg(normalize)
   args <- list(...)
   if ("json" %in% names(args) && is.null(json)) stop("'json' cannot be NULL")
   if ("tss" %in% names(args)) warning("'tss' cannot be set")
 
-  get_res <- function(x) {
-    data.frame(row.names = NULL, Target = TRUE, Sample = x$sample,
-      Position = x$filtered$nuclear$tss$pileup$x,
-      Signal = x$filtered$nuclear$tss$pileup$y)
-  }
-
   target <- quaqc(bam.files = bam.files, tss.size = tss.size, tss.qlen = tss.qlen,
-    tss.tn5 = tss.tn5, fast = fast, nfr = nfr, tss = target.motifs,
+    tss.tn5 = tss.tn5, fast = TRUE, nfr = nfr, tss = target.motifs,
     verbose = verbose, ...)
-  target.tss <- lapply(target$reports, get_res)
-  target.tss <- do.call(rbind, target.tss)
+  target.pileup <- melt_reports(target, "tss_pileup",
+    normalize.tss = normalize)
+  target.pileup$Region <- "Target"
 
-  bkg <- NULL
   if (!is.null(bkg.motifs)) {
     bkg <- quaqc(bam.files = bam.files, tss.size = tss.size, tss.qlen = tss.qlen,
-      tss.tn5 = tss.tn5, fast = fast, nfr = nfr, tss = bkg.motifs,
+      tss.tn5 = tss.tn5, fast = TRUE, nfr = nfr, tss = bkg.motifs,
       verbose = verbose, ...)
-    bkg.tss <- lapply(bkg$reports, get_res)
-    bkg.tss <- do.call(rbind, bkg.tss)
-    bkg.tss$Target <- FALSE
+    bkg.pileup <- melt_reports(bkg, "tss_pileup",
+      normalize.tss = normalize)
+    bkg.pileup$Region <- "Background"
+    target.pileup <- rbind(target.pileup, bkg.pileup)
   }
 
-  if (!is.null(bkg.tss)) target.tss <- rbind(target.tss, bkg.tss)
+  # TODO: divide the pileup values by the number of total reads?
 
-  target.tss
+  colnames(target.pileup) <- c("Sample", "Distance", "Frequency", "Target")
+
+  target.pileup[, c(1, 4, 2, 3)]
 
 }
 
