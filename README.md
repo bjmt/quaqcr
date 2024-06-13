@@ -46,7 +46,7 @@ library(ggplot2)
 
 blacklist <- system.file("extdata", "bl.bed.gz", package = "quaqcr")
 peaks <- system.file("extdata", "peaks.bed.gz", package = "quaqcr")
-tss <- system.file("extdata", "targets.bed.gz", package = "quaqcr")
+tss <- system.file("extdata", "tss.bed.gz", package = "quaqcr")
 bam <- "SRR26098097.Chr4MtPt.bam"
 ```
 
@@ -71,24 +71,25 @@ this too so it is taken into account when computing quality metrics.
 ```R
 report <- quaqc(bam, peaks = peaks, tss = tss, blacklist = blacklist,
   target.names = c("4", "Mt", "Pt"), tss.tn5 = TRUE)
-#> quaqc -v --json - --target-names 4,Mt,Pt --no-output --tss-tn5 --blacklist /Users/ben/quaqcr/inst/extdata/bl.bed.gz --tss /Users/ben/quaqcr/inst/extdata/targets.bed.gz --peaks /Users/ben/quaqcr/inst/extdata/peaks.bed.gz SRR26098097.Chr4MtPt.bam
+#> quaqc -v --json - --target-names 4,Mt,Pt --no-output --tss-tn5 --blacklist /Users/ben/quaqcr/inst/extdata/bl.bed.gz --tss /Users/ben/quaqcr/inst/extdata/tss.bed.gz --peaks /Users/ben/quaqcr/inst/extdata/peaks.bed.gz SRR26098097.Chr4MtPt.bam
+#> Warning: Removed 600 overlapping ranges in --tss.
 #> Starting file: SRR26098097.Chr4MtPt.bam [thread#1]
 #> Finished file: SRR26098097.Chr4MtPt.bam
 #> |--> Processed 9.8 M reads, 46.6% passing filters.
-#> |--> Time to process: 6 seconds.
+#> |--> Time to process: 5 seconds.
 #> 
-#> Done. Processed 1 sample (1 successfully) in 6 seconds.
-#> All QC results saved in JSON output: /dev/stdout
-#> Peak memory usage: 3.47 MB
+#> Done. Processed 1 sample (1 successfully) in 5 seconds.
+#>  All QC results saved in JSON output: /dev/stdout
+#>  memory usage: 3.50 MB
 ```
 
-This `quaqc` function is merely a wrapper around the program of the same
+This `quaqc()` function is merely a wrapper around the program of the same
 name. All options are available to be changed; see `?quaqc` for a list.
 The brief description of the options can also be displayed by simply
 running `quaqc()` without any arguments from within R. The only non-default
 options are those regarding the output report: creation of the regular
 text report is suppressed and the JSON report is output directly to
-within R. Of course, this can all be adjusted from within R.
+within R. Of course, this can all be adjusted.
 
 ### Exposing quaqc statistics
 
@@ -97,9 +98,9 @@ structure.
 
 ```R
 report
-#> quaqc v1.0
+#> quaqc v1.1
 #> Run title: ---
-#> Run date: 2024-06-10 15:38:19 CEST
+#> Run date: 2024-06-13 13:57:38 CEST
 #> Number of samples: 1
 #> Number of fails:   0
 #> Reports:
@@ -116,16 +117,16 @@ We can view the metadata available for the run:
 ```R
 report$metadata
 #> $version
-#> [1] "1.0"
+#> [1] "1.1"
 #> 
 #> $title
 #> [1] ""
 #> 
 #> $date
-#> [1] "2024-06-10 15:38:19 CEST"
+#> [1] "2024-06-13 13:57:38 CEST"
 #> 
 #> $args
-#> [1] "-v --json - --target-names 4,Mt,Pt --no-output --blacklist /Users/ben/quaqcr/inst/extdata/bl.bed.gz --tss /Users/ben/quaqcr/inst/extdata/targets.bed.gz --peaks /Users/ben/quaqcr/inst/extdata/peaks.bed.gz "
+#> [1] "-v --json - --target-names 4,Mt,Pt --no-output --tss-tn5 --blacklist /Users/ben/quaqcr/inst/extdata/bl.bed.gz --tss /Users/ben/quaqcr/inst/extdata/tss.bed.gz --peaks /Users/ben/quaqcr/inst/extdata/peaks.bed.gz "
 #> 
 #> $samples
 #> [1] 1
@@ -142,7 +143,7 @@ report$reports
 #> Processed 1 sequences (18293156 bp).
 #> Reads: 9846473 total; 3867479 passing.
 #> GC histo: yes. Depths histo: yes.
-#> Peak stats: no. TSS pileup: no.
+#> Peak stats: yes. TSS pileup: yes.
 #> Available slots:
 #> $sample      -- Sample filename
 #> $success     -- Run status
@@ -164,18 +165,42 @@ with the BAM:
 
 ```R
 melt_reports(report, "genome")
+#>                     Sample      Sequence Count      Size
+#> 1 SRR26098097.Chr4MtPt.bam         total     7 119667750
+#> 2 SRR26098097.Chr4MtPt.bam       nuclear     5 119146348
+#> 3 SRR26098097.Chr4MtPt.bam mitochondrial     1    366924
+#> 4 SRR26098097.Chr4MtPt.bam     plastidic     1    154478
+#> 5 SRR26098097.Chr4MtPt.bam     effective     1  18293156
 ```
 
 Some stats about all reads before any filtering parameters are applied:
 
 ```R
 melt_reports(report, "overview_unfilt")
+#>                     Sample             Reads Nuclear Mitochondrial Plastidic
+#> 1 SRR26098097.Chr4MtPt.bam             Total 5797181       1086755   2950676
+#> 2 SRR26098097.Chr4MtPt.bam        Duplicated 1350466        338549   2200811
+#> 3 SRR26098097.Chr4MtPt.bam                SE       0             0         0
+#> 4 SRR26098097.Chr4MtPt.bam                PE 5797181       1086755   2950676
+#> 5 SRR26098097.Chr4MtPt.bam        ProperMate 5788014       1085446   2947024
+#> 6 SRR26098097.Chr4MtPt.bam           Primary 5797181       1086755   2950676
+#> 7 SRR26098097.Chr4MtPt.bam PrimaryDuplicated 1350466        338549   2200811
+#> 8 SRR26098097.Chr4MtPt.bam         Secondary       0             0         0
+#> 9 SRR26098097.Chr4MtPt.bam     Supplementary       0             0         0
 ```
 
 And finally, overview stats about the final reads after filtering:
 
 ```R
 melt_reports(report, "overview_filt")
+#>                     Sample           Reads    Nuclear Mitochondrial Plastidic
+#> 1 SRR26098097.Chr4MtPt.bam  AlnPassFilters 3867479.00     296438.00 416192.00
+#> 2 SRR26098097.Chr4MtPt.bam      AlnSizeAvg      92.36         87.63    105.03
+#> 3 SRR26098097.Chr4MtPt.bam    ReadDepthAvg      19.53         70.80    282.97
+#> 4 SRR26098097.Chr4MtPt.bam FragPassFilters 1933741.00     148219.00 208096.00
+#> 5 SRR26098097.Chr4MtPt.bam     FragSizeAvg     129.67        113.33    148.24
+#> 6 SRR26098097.Chr4MtPt.bam         MAPQAvg      41.38         41.23     41.32
+#> 7 SRR26098097.Chr4MtPt.bam        GCPctAvg      37.14         46.22     34.64
 ```
 
 There is quite a bit of data beyond this associated with the final
@@ -183,12 +208,30 @@ nuclear-aligned reads.
 
 ```R
 melt_reports(report, "nucl_stats")
+#>                     Sample      Reads AlignmentSize FragmentSize   MAPQ
+#> 1 SRR26098097.Chr4MtPt.bam        Min         18.00         18.0 30.000
+#> 2 SRR26098097.Chr4MtPt.bam  1stPctile         37.00         38.0 30.000
+#> 3 SRR26098097.Chr4MtPt.bam    Average         92.36        129.7 41.380
+#> 4 SRR26098097.Chr4MtPt.bam         SD         43.14        133.9  2.293
+#> 5 SRR26098097.Chr4MtPt.bam 99thPctile        150.00        996.0 42.000
+#> 6 SRR26098097.Chr4MtPt.bam        Max        150.00       1845.0 42.000
+#>   ReadDepth GCPercent
+#> 1      0.00     3.000
+#> 2      5.00    21.000
+#> 3     19.53    37.143
+#> 4     24.56     8.709
+#> 5    305.00    61.000
+#> 6    685.00    87.000
 ```
 ```R
 melt_reports(report, "nucl_addn")
+#>                     Sample GenomeCoverage AlnNoMAPQ
+#> 1 SRR26098097.Chr4MtPt.bam         0.9818         0
 ```
 ```R
 melt_reports(report, "peak_stats")
+#>                     Sample PeakCount PeakGenomeCov    FRIP
+#> 1 SRR26098097.Chr4MtPt.bam      4557         0.127 0.01357
 ```
 (Not that for illustrative purposes, I am using a partial peak set from
 a previous project where I performed ATAC-seq during germination;
@@ -196,6 +239,8 @@ thus most of the peaks in this particular mesophyll sample are different,
 leading to the very low FRIP score.)
 ```R
 melt_reports(report, "tss_stats")
+#>                     Sample TSSCount   TES
+#> 1 SRR26098097.Chr4MtPt.bam     3026 2.627
 ```
 
 All of the above data are the same set of statistics included in the basic
@@ -225,17 +270,20 @@ for plotting, we will use `melt_reports()` to get it into a format ready for
 plotting with `ggplot2`:
 
 ```R
-frag.hist <- melt_reports(report, "frag_hist")
+frag.hist <- melt_reports(report, "frag_hist", normalize.hist = "max")
 ggplot(frag.hist, aes(FragSize, Count)) +
   scale_x_continuous(limits = c(0, 1000)) +
+  ylab("Density") +
+  xlab("Fragment size") +
   geom_line() +
   theme_bw()
 ```
+<img src="inst/figures/FragSize.png" width="75%" />
 
 Now we can see the clear nucleosome-free peak below ~125 bp in the plot.
 There is a bit of a hump around 150-200 bp, perhaps indicative of 
 mononucleosomal fragments, though in case it is not very distinct; 
-though this can be vary variable between samples. 
+in my experience this can be vary variable between samples. 
 
 To see the effect that the presence of nucleosomes has on transposition,
 we can compare with the distribution from chloroplastic reads. To do this,
@@ -243,20 +291,21 @@ we can first re-run quaqc and tell it to only gather data from the
 chloroplast and treat it as a "nuclear" sequence:
 
 ```R
-report.pt <- quaqc(bam, target.names = "Pt", plastids = " ")
-frag.hist.pt <- melt_reports(report.pt, "frag_hist")
+report.pt <- quaqc(bam, target.names = "Pt", plastids = " ", verbose = 0)
+#> quaqc --json - --target-names Pt --plastids   --no-output SRR26098097.Chr4MtPt.bam
+frag.hist.pt <- melt_reports(report.pt, "frag_hist", normalize.hist = "max")
 frag.hist$Sample <- "Nuclear"
 frag.hist.pt$Sample <- "Chloroplastic"
-frag.hist$Count <- frag.hist$Count / max(frag.hist$Count)
-frag.hist.pt$Count <- frag.hist.pt$Count / max(frag.hist.pt$Count)
 frag.hist <- rbind(frag.hist, frag.hist.pt)
 ggplot(frag.hist, aes(FragSize, Count, colour = Sample)) +
   scale_x_continuous(limits = c(0, 1000)) +
   ylab("Density") +
+  xlab("Fragment size") +
   scale_colour_discrete(name = element_blank()) +
   geom_line() +
   theme_bw()
 ```
+<img src="inst/figures/FragSizeComparison.png" width="75%" />
 
 Now we can see that there is no clear distinct sub-nucleosomal peak in
 naked DNA.
@@ -265,12 +314,10 @@ Next, we can take a look at the GC histograms. Since we have the report
 from the chloroplast, we can compare with that too:
 
 ```R
-gc.hist <- melt_reports(report, "gc_hist")
-gc.hist.pt <- melt_reports(report.pt, "gc_hist")
+gc.hist <- melt_reports(report, "gc_hist", normalize.hist = "max")
+gc.hist.pt <- melt_reports(report.pt, "gc_hist", normalize.hist = "max")
 gc.hist$Sample <- "Nuclear"
 gc.hist.pt$Sample <- "Chloroplastic"
-gc.hist$Count <- gc.hist$Count / max(gc.hist$Count)
-gc.hist.pt$Count <- gc.hist.pt$Count / max(gc.hist.pt$Count)
 gc.hist <- rbind(gc.hist, gc.hist.pt)
 ggplot(gc.hist, aes(GCPercent, Count, colour = Sample)) +
   scale_x_continuous(limits = c(0, 100)) +
@@ -279,6 +326,7 @@ ggplot(gc.hist, aes(GCPercent, Count, colour = Sample)) +
   geom_line() +
   theme_bw()
 ```
+<img src="inst/figures/GCPercentComparison.png" width="75%" />
 
 From this we can see the chloroplast reads are slightly more AT rich,
 and we get a nice distribution from the nuclear reads without any
@@ -287,12 +335,10 @@ spikes or additional peaks.
 Finally, we can look at the read depths:
 
 ```R
-depth.hist <- melt_reports(report, "depth_hist")
-depth.hist.pt <- melt_reports(report.pt, "depth_hist")
+depth.hist <- melt_reports(report, "depth_hist", normalize.hist = "max")
+depth.hist.pt <- melt_reports(report.pt, "depth_hist", normalize.hist = "max")
 depth.hist$Sample <- "Nuclear"
 depth.hist.pt$Sample <- "Chloroplastic"
-depth.hist$Count <- depth.hist$Count / max(depth.hist$Count)
-depth.hist.pt$Count <- depth.hist.pt$Count / max(depth.hist.pt$Count)
 depth.hist <- rbind(depth.hist, depth.hist.pt)
 ggplot(depth.hist, aes(ReadDepth, Count, colour = Sample)) +
   ylab("Density") +
@@ -300,6 +346,7 @@ ggplot(depth.hist, aes(ReadDepth, Count, colour = Sample)) +
   geom_line() +
   theme_bw()
 ```
+<img src="inst/figures/ReadDepthComparison.png" width="75%" />
 
 The nuclear read depth peaks around 12, with a long tail to the right.
 There is a small spike at 0, which could be from repetitive regions
@@ -316,9 +363,11 @@ ggplot(depth.hist, aes(ReadDepth, Count, colour = Sample)) +
   geom_line() +
   theme_bw()
 ```
+<img src="inst/figures/ReadDepthComparisonLog10.png" width="75%" />
 
 Now we can see just how high the read depth of the chloroplast
-is!
+is! (In reality it is about ten times this, since this BAM has
+been subsampled to 10% of the chloroplast-aligned reads.)
 
 ### Transcription start site enrichment
 
@@ -327,11 +376,13 @@ data is TSS enrichment, since promoters tend to be quite accessible
 and comparing their average accessibility with background levels
 can be a good way to gage the signal-to-noise ratio of the experiment.
 
-We can take a look at the precomputed TSS enrichment score (TES),
-using `melt_reports()` again for simplicity:
+Let's take a look at the precomputed TSS enrichment score (TES) again,
+using `melt_reports()` once more for simplicity:
 
 ```R
 melt_reports(report, "tss_stats")
+#>                     Sample TSSCount   TES
+#> 1 SRR26098097.Chr4MtPt.bam     3026 2.627
 ```
 
 This score is calculated by dividing the max read depth in the middle
@@ -343,12 +394,13 @@ option we can activate to transform the read depths into relative
 read depth:
 
 ```R
-tss.pileup <- melt_reports(report, "tss_pileup", normalize.tss = TRUE)
+tss.pileup <- melt_reports(report, "tss_pileup", normalize.tss = "bkg")
 ggplot(tss.pileup, aes(Coordinate, Depth)) +
   geom_line() +
   ylab("Density") +
   theme_bw()
 ```
+<img src="inst/figures/TSSPileup.png" width="75%" />
 
 This is also a great way to compare the effects of read filtering
 parameters. For example, we can see what happens if we simply
@@ -357,11 +409,13 @@ filters (via `--strict`):
 
 ```R
 report.filt <- quaqc(bam, peaks = peaks, tss = tss, blacklist = blacklist,
-  target.names = c("4", "Mt", "Pt"), tss.tn5 = TRUE, strict = TRUE)
+  target.names = c("4", "Mt", "Pt"), tss.tn5 = TRUE, strict = TRUE, v = 0)
+#> quaqc --json - --target-names 4,Mt,Pt --no-output --strict --tss-tn5 --blacklist /Users/ben/quaqcr/inst/extdata/bl.bed.gz --tss /Users/ben/quaqcr/inst/extdata/tss.bed.gz --peaks /Users/ben/quaqcr/inst/extdata/peaks.bed.gz SRR26098097.Chr4MtPt.bam
 report.all <- quaqc(bam, peaks = peaks, tss = tss, blacklist = blacklist,
-  target.names = c("4", "Mt", "Pt"), tss.tn5 = TRUE, use.all = TRUE)
-tss.pileup.filt <- melt_reports(report.filt, "tss_pileup", normalize.tss = TRUE)
-tss.pileup.all <- melt_reports(report.all, "tss_pileup", normalize.tss = TRUE)
+#> quaqc --json - --target-names 4,Mt,Pt --no-output --tss-tn5 --use-all --blacklist /Users/ben/quaqcr/inst/extdata/bl.bed.gz --tss /Users/ben/quaqcr/inst/extdata/tss.bed.gz --peaks /Users/ben/quaqcr/inst/extdata/peaks.bed.gz SRR26098097.Chr4MtPt.bam
+  target.names = c("4", "Mt", "Pt"), tss.tn5 = TRUE, use.all = TRUE, v = 0)
+tss.pileup.filt <- melt_reports(report.filt, "tss_pileup", normalize.tss = "bkg")
+tss.pileup.all <- melt_reports(report.all, "tss_pileup", normalize.tss = "bkg")
 tss.pileup.filt$Sample <- "Filtered"
 tss.pileup.all$Sample <- "All"
 tss.pileup.filt <- rbind(tss.pileup.filt, tss.pileup.all)
@@ -370,6 +424,7 @@ ggplot(tss.pileup.filt, aes(Coordinate, Depth, colour = Sample)) +
   ylab("Density") +
   theme_bw()
 ```
+<img src="inst/figures/TSSPileupComparison.png" width="75%" />
 
 Evidently, only keeping the best reads can provide a decent boost to
 the signal-to-noise ratio!
@@ -399,8 +454,11 @@ kind of analysis:
 TATA_peaks <- system.file("extdata", "tata_p.bed.gz", package = "quaqcr")
 TATA_bkg <- system.file("extdata", "tata_n.bed.gz", package = "quaqcr")
 
-TATA_fp <- footprint(TATA_peaks, bam, bkg.motifs = TATA_bkg,
+TATA.fp <- footprint(TATA_peaks, bam, bkg.motifs = TATA_bkg,
   target.names = "4")
+#> quaqc --tss-qlen 1 --tss-size 501 --json - --target-names 4 --no-output --nfr --fast --tss-tn5 --tss /Users/ben/quaqcr/inst/extdata/tata_p.bed.gz SRR26098097.Chr4MtPt.bam
+#> 
+#> quaqc --tss-qlen 1 --tss-size 501 --json - --target-names 4 --no-output --nfr --fast --tss-tn5 --tss /Users/ben/quaqcr/inst/extdata/tata_n.bed.gz SRR26098097.Chr4MtPt.bam
 ggplot(TATA.fp, aes(Distance, Frequency)) +
   scale_colour_discrete(name = element_blank()) +
   geom_line() +
@@ -409,6 +467,7 @@ ggplot(TATA.fp, aes(Distance, Frequency)) +
   facet_wrap(~Target) +
   theme_bw()
 ```
+<img src="inst/figures/Footprint.png" width="75%" />
 
 We can see in this plot how the TATA box itself seems to be quite
 susceptible to transposition, but immediately downstream there
@@ -429,12 +488,14 @@ can test the function using the included peak file, using a higher
 ```R
 peak.pileup <- pileup(peaks, bam, qlen = 250, region.size = 10001,
   use.all = TRUE, target.names = "4")
+#> quaqc --tss-qlen 250 --tss-size 10001 --json - --target-names 4 --no-output --fast --use-all --tss /Users/ben/quaqcr/inst/extdata/peaks.bed.gz SRR26098097.Chr4MtPt.bam
 ggplot(peak.pileup, aes(Position, Signal)) +
   geom_line() +
   xlab("Distance from peak (bp)") +
   ylab("RPM") +
   theme_bw()
 ```
+<img src="inst/figures/PeakPileup.png" width="75%" />
 
 A few points to remember when using this function:
 
@@ -455,26 +516,30 @@ region in the genome in place of using a genome browser:
 peak1 <- system.file("extdata", "peak1.bed.gz", package = "quaqcr")
 peak1.pileup <- pileup(peak1, bam, qlen = 0, region.size = 5001,
   use.all = TRUE, target.names = "4", tss.tn5 = TRUE)
-ggplot(peak.pileup, aes(Position, Signal)) +
+#> quaqc --tss-qlen 0 --tss-size 5001 --json - --target-names 4 --no-output --fast --tss-tn5 --use-all --tss /Users/ben/quaqcr/inst/extdata/peak1.bed.gz SRR26098097.Chr4MtPt.bam
+ggplot(peak1.pileup, aes(Position, Signal)) +
   geom_line() +
   ylab("RPM") +
   xlab("Chr4:5164654..5169654") +
   theme_bw()
 ```
+<img src="inst/figures/GenomeBrowserAll.png" width="75%" />
 
 In this case we've simply plotted all reads in the BAM file as they
 appear in this region. We can compare with filtering the reads and
 resizing them from the point of insertion:
 
 ```R
-peak1.filt <- pileup(peak1, bam, qlen = 100, region.size = 5001,v=1,
+peak1.filt <- pileup(peak1, bam, qlen = 100, region.size = 5001,
   strict = TRUE, target.names = "4", tss.tn5 = TRUE)
+#> quaqc -v --tss-qlen 100 --tss-size 5001 --json - --target-names 4 --no-output --strict --fast --tss-tn5 --tss /Users/ben/quaqcr/inst/extdata/peak1.bed.gz SRR26098097.Chr4MtPt.bam
 ggplot(peak1.filt, aes(Position, Signal)) +
   geom_line() +
   ylab("RPM") +
   xlab("Chr4:5164654..5169654") +
   theme_bw()
 ```
+<img src="inst/figures/GenomeBrowserFilt.png" width="75%" />
 
 This concludes the overview of the functionality provided by
 the `quaqcr` package. Feel free to open

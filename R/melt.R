@@ -3,12 +3,14 @@ melt_reports <- function(report, section = c("bam_stats",
     "overview_unfilt", "overview_filt", "nucl_stats", "nucl_addn",
     "peak_stats", "tss_stats", "tss_pileup", "aln_hist", "frag_hist", "gc_hist",
     "depth_hist", "tss_pileup", "genome"),
-  use.basename = FALSE, normalize.tss = c("no", "bkg", "rpm")) {
+  use.basename = FALSE, normalize.tss = c("no", "bkg", "rpm"),
+  normalize.hist = c("no", "proportion", "max")) {
 
   if (!is(report, "quaqc")) stop("'report' must be a 'quaqc' class object")
 
   section <- match.arg(section)
   normalize.tss <- match.arg(normalize.tss)
+  normalize.hist <- match.arg(normalize.hist)
 
   reports <- report$reports
   sample.names <- sapply(reports, function(x) x$sample)
@@ -22,10 +24,10 @@ melt_reports <- function(report, section = c("bam_stats",
     "peak_stats" = get_peak_stats(reports, sample.names),
     "tss_stats" = get_tss_stats(reports, sample.names),
     "tss_pileup" = get_tss_pileup(reports, sample.names, normalize.tss),
-    "aln_hist" = get_aln_hist(reports, sample.names),
-    "frag_hist" = get_frag_hist(reports, sample.names),
-    "gc_hist" = get_gc_hist(reports, sample.names),
-    "depth_hist" = get_depth_hist(reports, sample.names),
+    "aln_hist" = get_aln_hist(reports, sample.names, normalize.hist),
+    "frag_hist" = get_frag_hist(reports, sample.names, normalize.hist),
+    "gc_hist" = get_gc_hist(reports, sample.names, normalize.hist),
+    "depth_hist" = get_depth_hist(reports, sample.names, normalize.hist),
     "genome" = get_genome(reports, sample.names)
   )
 
@@ -35,7 +37,7 @@ melt_reports <- function(report, section = c("bam_stats",
 
 }
 
-get_depth_hist <- function(r, sn) {
+get_depth_hist <- function(r, sn, normhist) {
   nRow <- sapply(r, function(x) length(x$filtered$nuclear$histograms$depth$x))
   o <- data.frame(row.names = NULL,
     Sample = rep(sn, times = nRow),
@@ -46,11 +48,16 @@ get_depth_hist <- function(r, sn) {
     i_i <- (1:(nRow[i])) + sum(nRow[0:(i - 1)])
     o$ReadDepth[i_i] <- r[[i]]$filtered$nuclear$histograms$depth$x
     o$Count[i_i] <- r[[i]]$filtered$nuclear$histograms$depth$y
+    if (normhist == "proportion") {
+      o$Count[i_i] <- o$Count[i_i] / sum(o$Count[i_i])
+    } else if (normhist == "max") {
+      o$Count[i_i] <- o$Count[i_i] / max(o$Count[i_i])
+    }
   }
   o
 }
 
-get_gc_hist <- function(r, sn) {
+get_gc_hist <- function(r, sn, normhist) {
   nRow <- sapply(r, function(x) length(x$filtered$nuclear$histograms$gc$x))
   o <- data.frame(row.names = NULL,
     Sample = rep(sn, times = nRow),
@@ -61,11 +68,16 @@ get_gc_hist <- function(r, sn) {
     i_i <- (1:(nRow[i])) + sum(nRow[0:(i - 1)])
     o$GCPercent[i_i] <- r[[i]]$filtered$nuclear$histograms$gc$x
     o$Count[i_i] <- r[[i]]$filtered$nuclear$histograms$gc$y
+    if (normhist == "proportion") {
+      o$Count[i_i] <- o$Count[i_i] / sum(o$Count[i_i])
+    } else if (normhist == "max") {
+      o$Count[i_i] <- o$Count[i_i] / max(o$Count[i_i])
+    }
   }
   o
 }
 
-get_frag_hist <- function(r, sn) {
+get_frag_hist <- function(r, sn, normhist) {
   nRow <- sapply(r, function(x) length(x$filtered$nuclear$histograms$fragment$x))
   o <- data.frame(row.names = NULL,
     Sample = rep(sn, times = nRow),
@@ -76,11 +88,16 @@ get_frag_hist <- function(r, sn) {
     i_i <- (1:(nRow[i])) + sum(nRow[0:(i - 1)])
     o$FragSize[i_i] <- r[[i]]$filtered$nuclear$histograms$fragment$x
     o$Count[i_i] <- r[[i]]$filtered$nuclear$histograms$fragment$y
+    if (normhist == "proportion") {
+      o$Count[i_i] <- o$Count[i_i] / sum(o$Count[i_i])
+    } else if (normhist == "max") {
+      o$Count[i_i] <- o$Count[i_i] / max(o$Count[i_i])
+    }
   }
   o
 }
 
-get_aln_hist <- function(r, sn) {
+get_aln_hist <- function(r, sn, normhist) {
   nRow <- sapply(r, function(x) length(x$filtered$nuclear$histograms$alignment$x))
   o <- data.frame(row.names = NULL,
     Sample = rep(sn, times = nRow),
@@ -91,6 +108,11 @@ get_aln_hist <- function(r, sn) {
     i_i <- (1:(nRow[i])) + sum(nRow[0:(i - 1)])
     o$AlnSize[i_i] <- r[[i]]$filtered$nuclear$histograms$alignment$x
     o$Count[i_i] <- r[[i]]$filtered$nuclear$histograms$alignment$y
+    if (normhist == "proportion") {
+      o$Count[i_i] <- o$Count[i_i] / sum(o$Count[i_i])
+    } else if (normhist == "max") {
+      o$Count[i_i] <- o$Count[i_i] / max(o$Count[i_i])
+    }
   }
   o
 }
