@@ -14,7 +14,34 @@ reports, though it can be used to execute quaqc from within R.
 
 ## Quick start
 
-TODO.
+Run quaqc from within R:
+
+```R
+report <- quaqc("Sample.bam", peaks = "Peaks.bed", tss = "TSS.bed",
+  blacklist = "Blacklist.bed")
+```
+
+Load a previous run into R:
+
+```R
+report <- parse_quaqc_file("report.json.gz")
+```
+
+Explore the various datasets available within quaqc reports,
+ready for plotting with ggplot2:
+
+```R
+melt_reports(report, "genome")
+melt_reports(report, "overview_unfilt")
+melt_reports(report, "overview_filt")
+melt_reports(report, "nucl_stats")
+melt_reports(report, "nucl_addn")
+melt_reports(report, "peak_stats")
+melt_reports(report, "frag_hist", normalize.hist = "proportion")
+melt_reports(report, "depth_hist", normalize.hist = "proportion")
+melt_reports(report, "gc_hist", normalize.hist = "proportion")
+melt_reports(report, "tss_pileup", normalize.tss = "bkg")
+```
 
 ## Tutorial
 
