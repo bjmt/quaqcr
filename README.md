@@ -305,7 +305,7 @@ ggplot(frag.hist, aes(FragSize, Count, colour = Sample)) +
   geom_line() +
   theme_bw()
 ```
-<img src="inst/figures/FragSizeComparison.png" width="75%" />
+<img src="inst/figures/FragSizeComparison.png" width="100%" />
 
 Now we can see that there is no clear distinct sub-nucleosomal peak in
 naked DNA.
@@ -326,7 +326,7 @@ ggplot(gc.hist, aes(GCPercent, Count, colour = Sample)) +
   geom_line() +
   theme_bw()
 ```
-<img src="inst/figures/GCPercentComparison.png" width="75%" />
+<img src="inst/figures/GCPercentComparison.png" width="100%" />
 
 From this we can see the chloroplast reads are slightly more AT rich,
 and we get a nice distribution from the nuclear reads without any
@@ -346,7 +346,7 @@ ggplot(depth.hist, aes(ReadDepth, Count, colour = Sample)) +
   geom_line() +
   theme_bw()
 ```
-<img src="inst/figures/ReadDepthComparison.png" width="75%" />
+<img src="inst/figures/ReadDepthComparison.png" width="100%" />
 
 The nuclear read depth peaks around 12, with a long tail to the right.
 There is a small spike at 0, which could be from repetitive regions
@@ -363,7 +363,7 @@ ggplot(depth.hist, aes(ReadDepth, Count, colour = Sample)) +
   geom_line() +
   theme_bw()
 ```
-<img src="inst/figures/ReadDepthComparisonLog10.png" width="75%" />
+<img src="inst/figures/ReadDepthComparisonLog10.png" width="100%" />
 
 Now we can see just how high the read depth of the chloroplast
 is! (In reality it is about ten times this, since this BAM has
@@ -424,7 +424,7 @@ ggplot(tss.pileup.filt, aes(Coordinate, Depth, colour = Sample)) +
   ylab("Density") +
   theme_bw()
 ```
-<img src="inst/figures/TSSPileupComparison.png" width="75%" />
+<img src="inst/figures/TSSPileupComparison.png" width="100%" />
 
 Evidently, only keeping the best reads can provide a decent boost to
 the signal-to-noise ratio!
@@ -467,7 +467,7 @@ ggplot(TATA.fp, aes(Distance, Frequency)) +
   facet_wrap(~Target) +
   theme_bw()
 ```
-<img src="inst/figures/Footprint.png" width="75%" />
+<img src="inst/figures/Footprint.png" width="100%" />
 
 We can see in this plot how the TATA box itself seems to be quite
 susceptible to transposition, but immediately downstream there
@@ -523,7 +523,7 @@ ggplot(peak1.pileup, aes(Position, Signal)) +
   xlab("Chr4:5164654..5169654") +
   theme_bw()
 ```
-<img src="inst/figures/GenomeBrowserAll.png" width="75%" />
+<img src="inst/figures/GenomeBrowserAll.png" width="100%" />
 
 In this case we've simply plotted all reads in the BAM file as they
 appear in this region. We can compare with filtering the reads and
@@ -539,7 +539,7 @@ ggplot(peak1.filt, aes(Position, Signal)) +
   xlab("Chr4:5164654..5169654") +
   theme_bw()
 ```
-<img src="inst/figures/GenomeBrowserFilt.png" width="75%" />
+<img src="inst/figures/GenomeBrowserFilt.png" width="100%" />
 
 This concludes the overview of the functionality provided by
 the `quaqcr` package. Feel free to open
