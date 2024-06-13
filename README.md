@@ -1,5 +1,7 @@
 # quaqcr: *QU*ick *A*TAC-seq *Q*uality *C*ontrol in *R*
 
+quaqcr is an accessory R package for [quaqc](https://github.com/bjmt/quaqc).
+
 ## Installation
 
 ```R
@@ -78,7 +80,7 @@ bam <- "SRR26098097.Chr4MtPt.bam"
 ```
 
 We will also set the `quaqc.bin` option globally to tell quaqcr where
-it can find the quaqc binary. By default, it is assumed to bin in the
+it can find the quaqc binary. By default, it is assumed to be in the
 user's `PATH`. It can also be set within each function.
 
 ```R
@@ -571,5 +573,5 @@ ggplot(peak1.filt, aes(Position, Signal)) +
 This concludes the overview of the functionality provided by
 the `quaqcr` package. Feel free to open
 an [issue](https://github.com/bjmt/quaqcr/issues) if you have
-any question!
+any questions!
 
