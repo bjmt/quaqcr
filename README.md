@@ -53,7 +53,7 @@ To follow along with this tutorial, download the example data
 from Zenodo using the following command:
 
 ```sh
-wget ...
+wget -O SRR26098097.Chr4MtPt.bam "https://zenodo.org/records/11653279/files/SRR26098097.Chr4MtPt.bam?download=1"
 ```
 
 This downloads a partial BAM for the SRA accession SRR26098097,
