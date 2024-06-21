@@ -458,7 +458,7 @@ ggplot(tss.pileup.filt, aes(Coordinate, Depth, colour = Sample)) +
 Evidently, only keeping the best reads can provide a decent boost to
 the signal-to-noise ratio!
 
-### Quick and dirty footprinting
+### Quick footprinting
 
 Since Tn5 insertion sites can be defined at single base resolution
 in ATAC-seq data, we can examine the insertion frequencies near
