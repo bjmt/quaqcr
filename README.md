@@ -9,8 +9,10 @@ if (!requireNamespace("remotes")) install.packages("remotes")
 remotes::install_github("bjmt/quaqcr")
 ```
 
+Installation of the quaqcr package has been tested on macOS (R v4.4.1), Windows (R v4.4.1 and v4.0.5), and Ubuntu linux (all major R versions from v4.4.1 back to R v3.6.3). Please open an issue if you are having trouble installing the package.
+
 See the [quaqc](https://github.com/bjmt/quaqc) repository
-for installation instructions. The quaqcr package does not
+for installation instructions for quaqc. The quaqcr package does not
 required quaqc to be installed to parse the output JSON
 reports, though it can be used to execute quaqc from within R.
 
