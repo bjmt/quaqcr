@@ -1,5 +1,5 @@
 Package: quaqcr
-Title: Quick ATAC-seq QC in R
+Title: Quick ATAC-Seq QC in R
 Version: 1.0.0
 Authors@R: 
     person(c("Benjamin", "Jean-Marie"), "Tremblay", role = c("aut", "cre"),
@@ -21,4 +21,4 @@ Encoding: UTF-8
 Depends: R (>= 3.6.3)
 Imports: methods, utils, jsonlite
 Roxygen: list(markdown = TRUE, old_usage = TRUE)
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.2

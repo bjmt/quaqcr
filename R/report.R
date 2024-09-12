@@ -238,6 +238,7 @@ identical_params <- function(x, y) {
 
 println <- function(...) cat(..., "\n", sep = "")
 
+#' @export
 print.quaqc <- function(x, ...) {
   if (!validate_quaqc(x))
     warning("'quaqc' object may be invalid", call. = FALSE, immediate. = TRUE)
@@ -259,6 +260,7 @@ print.quaqc <- function(x, ...) {
   invisible(x)
 }
 
+#' @export
 print.quaqc_report <- function(x, ...) {
   if (!validate_quaqc_report(x))
     warning("'quaqc_report' object may be invalid", call. = FALSE, immediate. = TRUE)

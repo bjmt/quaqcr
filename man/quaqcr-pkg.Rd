@@ -2,8 +2,14 @@
 % Please edit documentation in R/quaqcr.R
 \docType{package}
 \name{quaqcr-pkg}
+\alias{quaqcr}
+\alias{quaqcr-package}
 \alias{quaqcr-pkg}
 \title{quaqcr: Quick ATAC-seq QC in R}
 \description{
 A wrapper around the 'quaqc' program alongside additional utilities.
+}
+\author{
+\strong{Maintainer}: Benjamin Jean-Marie Tremblay \email{benjmtremblay@gmail.com} (\href{https://orcid.org/0000-0002-7441-2951}{ORCID})
+
 }

@@ -3,12 +3,11 @@
 #' @description
 #' A wrapper around the 'quaqc' program alongside additional utilities.
 #'
-#' @docType package
 #' @name quaqcr-pkg
 #' @aliases quaqcr-pkg
 #'
 #' @importFrom jsonlite fromJSON
 #' @importFrom methods is
 #' @importFrom utils write.table
-NULL
+"_PACKAGE"
 
