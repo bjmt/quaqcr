@@ -16,6 +16,8 @@ Description: A wrapper around the 'quaqc' program. 'quaqc' allows for
     metrics are related to genereal sequencing quality. This R package also
     provides additional utilities for custom analyses and plotting of 'quaqc'
     results.
+URL: https://github.com/bjmt/quaqcr
+BugReports: https://github.com/bjmt/quaqcr/issues
 License: GPL (>= 3)
 Encoding: UTF-8
 Depends: R (>= 3.6.3)
