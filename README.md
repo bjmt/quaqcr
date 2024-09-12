@@ -9,7 +9,7 @@ if (!requireNamespace("remotes")) install.packages("remotes")
 remotes::install_github("bjmt/quaqcr")
 ```
 
-Installation of the quaqcr package has been tested on macOS (R v4.4.1), Windows (R v4.4.1 and v4.0.5), and Ubuntu linux (all major R versions from v4.4.1 back to R v3.6.3). Please open an issue if you are having trouble installing the package.
+Installation of the quaqcr package has been tested on macOS (R v4.4.1), Windows (R v4.4.1 and v4.0.5), and Ubuntu linux (all minor R versions from v4.4.1 back to R v3.6.3). The package is very lightweight and only has one dependency, [jsonlite](https://CRAN.R-project.org/package=jsonlite). Please open an issue if you are having trouble installing the package.
 
 See the [quaqc](https://github.com/bjmt/quaqc) repository
 for installation instructions for quaqc. The quaqcr package does not
