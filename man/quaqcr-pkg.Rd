@@ -9,6 +9,14 @@
 \description{
 A wrapper around the 'quaqc' program alongside additional utilities.
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/bjmt/quaqcr}
+  \item Report bugs at \url{https://github.com/bjmt/quaqcr/issues}
+}
+
+}
 \author{
 \strong{Maintainer}: Benjamin Jean-Marie Tremblay \email{benjmtremblay@gmail.com} (\href{https://orcid.org/0000-0002-7441-2951}{ORCID})
 

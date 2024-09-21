@@ -6,8 +6,8 @@
 \usage{
 melt_reports(report, section = c("bam_stats", "overview_unfilt",
   "overview_filt", "nucl_stats", "nucl_addn", "peak_stats", "tss_stats",
-  "tss_pileup", "aln_hist", "frag_hist", "gc_hist", "depth_hist", "tss_pileup",
-  "genome"), use.basename = FALSE, normalize.tss = c("no", "bkg", "rpm"),
+  "tss_pileup", "aln_hist", "frag_hist", "gc_hist", "depth_hist", "genome"),
+  use.basename = FALSE, normalize.tss = c("no", "bkg", "rpm"),
   normalize.hist = c("no", "proportion", "max"))
 }
 \arguments{
