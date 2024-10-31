@@ -47,6 +47,13 @@ melt_reports(report, "gc_hist", normalize.hist = "proportion")
 melt_reports(report, "tss_pileup", normalize.tss = "bkg")
 ```
 
+## Citation
+
+Please cite the following journal article if you find this software useful
+in your research:
+
+Tremblay, B.J.M. and Qüesta, J.I. (2024). quaqc: efficient and quick ATAC-seq quality control and filtering. _Bioinformatics_, btae649. [https://doi.org/10.1093/bioinformatics/btae649](https://doi.org/10.1093/bioinformatics/btae649)
+
 ## Tutorial
 
 ### Download the example data

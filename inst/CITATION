@@ -1,0 +1,13 @@
+citHeader("Please cite the following publication if the quaqcr package has been useful for your research.")
+
+citEntry(
+  entry = "Article",
+  title = "quaqc: efficient and quick ATAC-seq quality control and filtering",
+  author = personList(as.person("Benjamin JM Tremblay"), as.person("Julia I Qüesta")),
+  journal = "Bioinformatics", year = 2024, pages = "btae649",
+  url = "https://doi.org/10.1093/bioinformatics/btae649",
+  doi = "10.1093/bioinformatics/btae649",
+  textVersion = "Tremblay BJM and Qüesta JI (2024). quaqc: efficient and quick ATAC-seq quality control and filtering. Bioinformatics, btae649."
+)
+
+
