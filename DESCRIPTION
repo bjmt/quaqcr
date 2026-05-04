@@ -24,3 +24,5 @@ Depends: R (>= 3.6.3)
 Imports: methods, utils, jsonlite
 Roxygen: list(markdown = TRUE, old_usage = TRUE)
 RoxygenNote: 7.3.2
+Suggests: testthat (>= 3.0.0)
+Config/testthat/edition: 3
