@@ -126,7 +126,7 @@ quaqc <- function(bam.files, mitochondria = NULL, plastids = NULL, peaks = NULL,
   if (missing(bam.files)) {
     help <- run_quaqc("-h")
     cat(help, sep = "\n")
-    return(invisible(c(version, help)))
+    return(invisible(help))
   }
 
   args <- as.character(bam.files)
@@ -138,9 +138,9 @@ quaqc <- function(bam.files, mitochondria = NULL, plastids = NULL, peaks = NULL,
       args <- c("--peaks", normalizePath(path.expand(peaks), mustWork = TRUE)[1], args)
     } else if (is(peaks, "GRanges")) {
       peaks <- as.data.frame(peaks)
-      peaks <- cbind(peaks$seqnames, peaks$start, peaks$end, ".", 1, peaks$strand)
+      peaks <- cbind(peaks$seqnames, peaks$start - 1L, peaks$end, ".", 1, peaks$strand)
       peaks.tmp <- tempfile("peaks", fileext = ".bed")
-      on.exit(unlink(peaks.tmp))
+      on.exit(unlink(peaks.tmp), add = TRUE)
       write.table(peaks, peaks.tmp, sep = "\t", row.names = FALSE, col.names = FALSE,
         quote = FALSE)
       args <- c("--peaks", peaks.tmp, args)
@@ -153,9 +153,9 @@ quaqc <- function(bam.files, mitochondria = NULL, plastids = NULL, peaks = NULL,
       args <- c("--tss", normalizePath(path.expand(tss), mustWork = TRUE)[1], args)
     } else if (is(tss, "GRanges")) {
       tss <- as.data.frame(tss)
-      tss <- cbind(tss$seqnames, tss$start, tss$end, ".", 1, tss$strand)
+      tss <- cbind(tss$seqnames, tss$start - 1L, tss$end, ".", 1, tss$strand)
       tss.tmp <- tempfile("tss", fileext = ".bed")
-      on.exit(unlink(tss.tmp))
+      on.exit(unlink(tss.tmp), add = TRUE)
       write.table(tss, tss.tmp, sep = "\t", row.names = FALSE, col.names = FALSE,
         quote = FALSE)
       args <- c("--tss", tss.tmp, args)
@@ -168,9 +168,9 @@ quaqc <- function(bam.files, mitochondria = NULL, plastids = NULL, peaks = NULL,
       args <- c("--target-list", normalizePath(path.expand(target.list), mustWork = TRUE)[1], args)
     } else if (is(target.list, "GRanges")) {
       target.list <- as.data.frame(target.list)
-      target.list <- cbind(target.list$seqnames, target.list$start, target.list$end, ".", 1, target.list$strand)
+      target.list <- cbind(target.list$seqnames, target.list$start - 1L, target.list$end, ".", 1, target.list$strand)
       target.list.tmp <- tempfile("target.list", fileext = ".bed")
-      on.exit(unlink(target.list.tmp))
+      on.exit(unlink(target.list.tmp), add = TRUE)
       write.table(target.list, target.list.tmp, sep = "\t", row.names = FALSE, col.names = FALSE,
         quote = FALSE)
       args <- c("--target-list", target.list.tmp, args)
@@ -183,9 +183,9 @@ quaqc <- function(bam.files, mitochondria = NULL, plastids = NULL, peaks = NULL,
       args <- c("--blacklist", normalizePath(path.expand(blacklist), mustWork = TRUE)[1], args)
     } else if (is(blacklist, "GRanges")) {
       blacklist <- as.data.frame(blacklist)
-      blacklist <- cbind(blacklist$seqnames, blacklist$start, blacklist$end, ".", 1, blacklist$strand)
+      blacklist <- cbind(blacklist$seqnames, blacklist$start - 1L, blacklist$end, ".", 1, blacklist$strand)
       blacklist.tmp <- tempfile("blacklist", fileext = ".bed")
-      on.exit(unlink(blacklist.tmp))
+      on.exit(unlink(blacklist.tmp), add = TRUE)
       write.table(blacklist, blacklist.tmp, sep = "\t", row.names = FALSE, col.names = FALSE,
         quote = FALSE)
       args <- c("--blacklist", blacklist.tmp, args)
@@ -253,9 +253,8 @@ quaqc <- function(bam.files, mitochondria = NULL, plastids = NULL, peaks = NULL,
 
   # Program args
 
-  if (verbose) {
-    if (verbose == 1) args <- c("-v", args)
-    else args <- c("-vv", args)
+  if (!is.null(verbose) && verbose >= 1) {
+    args <- c(if (verbose >= 2) "-vv" else "-v", args)
   }
 
   message("quaqc ", paste0(args, collapse = " "))
@@ -265,8 +264,8 @@ quaqc <- function(bam.files, mitochondria = NULL, plastids = NULL, peaks = NULL,
     parse_quaqc(fromJSON(res, simplifyDataFrame = FALSE))
   } else if (!is.null(json)) {
     f <- gzfile(normalizePath(path.expand(json))[1], "rt")
+    on.exit(close(f), add = TRUE)
     parse_quaqc(fromJSON(readLines(f), simplifyDataFrame = FALSE))
-    close(f)
   } else {
     invisible(NULL)
   }

@@ -38,7 +38,6 @@ footprint <- function(target.motifs, bam.files, bkg.motifs = NULL,
   normalize <- match.arg(normalize)
   args <- list(...)
   if ("json" %in% names(args) && is.null(args$json)) stop("'json' cannot be NULL")
-  if ("tss" %in% names(args)) warning("'tss' cannot be set")
 
   target <- quaqc(bam.files = bam.files, tss.size = tss.size, tss.qlen = tss.qlen,
     tss.tn5 = tss.tn5, fast = TRUE, nfr = nfr, tss = target.motifs,

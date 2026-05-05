@@ -55,10 +55,13 @@
 #' @export
 parse_quaqc <- function(json.text) {
   json <- json.text
-  stopifnot(is.list(json))
-  stopifnot(names(json) %in% c("quaqc_version", "quaqc_run_title", "quaqc_args",
-    "quaqc_time_start", "quaqc_params", "quaqc_reports", "quaqc_time_end",
-    "quaqc_max_bytes"))
+  required <- c("quaqc_version", "quaqc_run_title", "quaqc_args",
+    "quaqc_time_start", "quaqc_params", "quaqc_reports",
+    "quaqc_time_end", "quaqc_max_bytes")
+  if (!is.list(json)) stop("'json.text' must be a list")
+  missing_keys <- setdiff(required, names(json))
+  if (length(missing_keys))
+    stop("Missing required JSON keys: ", paste(missing_keys, collapse = ", "))
   meta <- list(
     version = json$quaqc_version,
     title = json$quaqc_run_title,
@@ -72,8 +75,8 @@ parse_quaqc <- function(json.text) {
       "target_seqs_n", "peak_bed_n", "tss_bed_n", "target_list_bed_n",
       "blacklist_bed_n", "read_groups_n", "mapq_min", "alignment_size_min",
       "alignment_size_max", "fragment_size_min", "fragment_size_max",
-      "alignment_histogram_max", "fagment_histogram_max",
-      "depth_histogram_max", "tss_histogram_max", "tss_histogram_size",
+      "alignment_histogram_max", "fragment_histogram_max",
+      "depth_histogram_max", "tss_histogram_size",
       "tss_read_size"
   )])
   params.logi <- unlist(json$quaqc_params[c(
@@ -88,7 +91,7 @@ parse_quaqc <- function(json.text) {
 #' @export
 parse_quaqc_file <- function(json.file) {
   json <- json.file
-  if (!is.character(json) && length(json) != 1) {
+  if (!is.character(json) || length(json) != 1) {
     stop("'json.file' must be a length 1 character vector")
   }
   f <- gzfile(normalizePath(path.expand(json))[1], "rt")

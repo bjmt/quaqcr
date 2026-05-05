@@ -38,6 +38,11 @@ melt_reports <- function(report, section = c("bam_stats",
 
   if (!is(report, "quaqc")) stop("'report' must be a 'quaqc' class object")
 
+  n_before <- length(report$reports)
+  report <- remove_fails(report)
+  if (length(report$reports) < n_before)
+    message("Dropped ", n_before - length(report$reports), " failed report(s).")
+
   section <- match.arg(section)
   normalize.tss <- match.arg(normalize.tss)
   normalize.hist <- match.arg(normalize.hist)
@@ -61,6 +66,7 @@ melt_reports <- function(report, section = c("bam_stats",
     "genome" = get_genome(reports, sample.names)
   )
 
+  out$Sample <- as.character(out$Sample)
   if (use.basename) out$Sample <- basename(out$Sample)
 
   out
@@ -75,7 +81,7 @@ get_depth_hist <- function(r, sn, normhist) {
     Count = NA
   )
   for (i in seq_along(r)) {
-    i_i <- (1:(nRow[i])) + sum(nRow[0:(i - 1)])
+    i_i <- seq_len(nRow[i]) + sum(nRow[seq_len(i - 1)])
     o$ReadDepth[i_i] <- r[[i]]$filtered$nuclear$histograms$depth$x
     o$Count[i_i] <- r[[i]]$filtered$nuclear$histograms$depth$y
     if (normhist == "proportion") {
@@ -95,7 +101,7 @@ get_gc_hist <- function(r, sn, normhist) {
     Count = NA
   )
   for (i in seq_along(r)) {
-    i_i <- (1:(nRow[i])) + sum(nRow[0:(i - 1)])
+    i_i <- seq_len(nRow[i]) + sum(nRow[seq_len(i - 1)])
     o$GCPercent[i_i] <- r[[i]]$filtered$nuclear$histograms$gc$x
     o$Count[i_i] <- r[[i]]$filtered$nuclear$histograms$gc$y
     if (normhist == "proportion") {
@@ -115,7 +121,7 @@ get_frag_hist <- function(r, sn, normhist) {
     Count = NA
   )
   for (i in seq_along(r)) {
-    i_i <- (1:(nRow[i])) + sum(nRow[0:(i - 1)])
+    i_i <- seq_len(nRow[i]) + sum(nRow[seq_len(i - 1)])
     o$FragSize[i_i] <- r[[i]]$filtered$nuclear$histograms$fragment$x
     o$Count[i_i] <- r[[i]]$filtered$nuclear$histograms$fragment$y
     if (normhist == "proportion") {
@@ -135,7 +141,7 @@ get_aln_hist <- function(r, sn, normhist) {
     Count = NA
   )
   for (i in seq_along(r)) {
-    i_i <- (1:(nRow[i])) + sum(nRow[0:(i - 1)])
+    i_i <- seq_len(nRow[i]) + sum(nRow[seq_len(i - 1)])
     o$AlnSize[i_i] <- r[[i]]$filtered$nuclear$histograms$alignment$x
     o$Count[i_i] <- r[[i]]$filtered$nuclear$histograms$alignment$y
     if (normhist == "proportion") {
@@ -155,7 +161,7 @@ get_tss_pileup <- function(r, sn, normtss) {
     Depth = NA
   )
   for (i in seq_along(r)) {
-    i_i <- (1:(nRow[i])) + sum(nRow[0:(i - 1)])
+    i_i <- seq_len(nRow[i]) + sum(nRow[seq_len(i - 1)])
     o$Coordinate[i_i] <- r[[i]]$filtered$nuclear$tss$pileup$x
     o$Depth[i_i] <- r[[i]]$filtered$nuclear$tss$pileup$y
     if (normtss == "bkg") {
@@ -163,15 +169,17 @@ get_tss_pileup <- function(r, sn, normtss) {
       bRange <- seq(bRange[1], bRange[2])
       bRange <- bRange[seq_len(length(bRange) * 0.25)]
       bDepths <- o$Depth[i_i][o$Coordinate[i_i] %in% bRange]
-      bDepths <- c(bDepths, rep(0, length(bRange) - length(bDepths)))
+      bDepths <- c(bDepths, rep(0, max(0L, length(bRange) - length(bDepths))))
       o$Depth[i_i] <- o$Depth[i_i] / mean(bDepths)
     } else if (normtss == "rpm") {
       # TODO: What if some ranges are outside the effective area?
       nranges <- r[[i]]$params$integer["tss_bed_n"]
+      if (is.na(nranges) || nranges == 0) nranges <- 1L
       aln.total <- r[[i]]$filtered$overview[1, 1]
       o$Depth[i_i] <- (o$Depth[i_i] * (1e6 / aln.total)) / nranges
     } else {
       nranges <- r[[i]]$params$integer["tss_bed_n"]
+      if (is.na(nranges) || nranges == 0) nranges <- 1L
       o$Depth[i_i] <- o$Depth[i_i] / nranges
     }
   }

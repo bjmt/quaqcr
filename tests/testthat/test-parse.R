@@ -27,20 +27,40 @@ test_that("the fixture quaqc_report is successful and has all sub-structures", {
 })
 
 test_that("parse_quaqc errors on a non-list input", {
-  expect_error(parse_quaqc("not a list"))
-  expect_error(parse_quaqc(42L))
+  expect_error(parse_quaqc("not a list"), "'json.text' must be a list")
+  expect_error(parse_quaqc(42L), "'json.text' must be a list")
 })
 
-test_that("parse_quaqc errors when JSON names are not the expected keys", {
-  bad_json <- list(bad_key = 1, another_bad = 2)
-  expect_error(parse_quaqc(bad_json))
+test_that("parse_quaqc errors when required JSON keys are missing", {
+  expect_error(
+    parse_quaqc(list(quaqc_version = "1")),
+    "Missing required JSON keys"
+  )
 })
 
-test_that("parse_quaqc_file errors on a non-length-1 non-character vector", {
+test_that("parse_quaqc_file errors on a non-character input", {
+  expect_error(
+    parse_quaqc_file(42L),
+    "'json.file' must be a length 1 character vector"
+  )
+})
+
+test_that("parse_quaqc_file errors on a length-2 character vector", {
+  expect_error(
+    parse_quaqc_file(c("a.json", "b.json")),
+    "'json.file' must be a length 1 character vector"
+  )
+})
+
+test_that("parse_quaqc_file errors on a length-2 non-character vector", {
   expect_error(
     parse_quaqc_file(c(1L, 2L)),
     "'json.file' must be a length 1 character vector"
   )
+})
+
+test_that("fragment_histogram_max is correctly parsed from fixture (not NA)", {
+  expect_false(is.na(FIXTURE$reports[[1]]$params$integer["fragment_histogram_max"]))
 })
 
 test_that("parse_quaqc_file round-trips through parse_quaqc", {

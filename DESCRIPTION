@@ -1,6 +1,6 @@
 Package: quaqcr
 Title: Quick ATAC-Seq QC in R
-Version: 1.0.0
+Version: 1.0.1
 Authors@R: 
     person(c("Benjamin", "Jean-Marie"), "Tremblay", role = c("aut", "cre"),
       email = "benjmtremblay@gmail.com",

@@ -40,7 +40,8 @@ pileup <- function(target.regions, bam.files, bkg.regions = NULL,
   normalize <- match.arg(normalize)
   args <- list(...)
   if ("json" %in% names(args) && is.null(args$json)) stop("'json' cannot be NULL")
-  if ("tss" %in% names(args)) warning("'tss' cannot be set")
+  if ("tss" %in% names(args))
+    stop("'tss' cannot be set; use 'target.regions' or 'bkg.regions' instead")
 
   target <- quaqc(bam.files = bam.files, tss.size = region.size, tss.qlen = qlen,
     fast = TRUE, tss = target.regions, verbose = verbose, ...)

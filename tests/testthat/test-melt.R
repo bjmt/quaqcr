@@ -7,6 +7,21 @@ test_that("melt_reports errors on invalid section argument", {
   expect_error(melt_reports(FIXTURE, "no_such_section"))
 })
 
+test_that("melt_reports drops failed reports and emits a message", {
+  failed_report <- structure(
+    list(sample = "fake.bam", success = FALSE,
+      params = FIXTURE$reports[[1]]$params,
+      genome = NULL, unfiltered = NULL, filtered = NULL),
+    class = "quaqc_report"
+  )
+  mixed <- FIXTURE
+  mixed$reports <- c(mixed$reports, list(failed_report))
+  mixed$metadata$samples <- 2L
+  expect_message(melt_reports(mixed, "bam_stats"), "Dropped 1 failed")
+  result <- suppressMessages(melt_reports(mixed, "bam_stats"))
+  expect_equal(nrow(result), 4L)
+})
+
 test_that("bam_stats section returns expected columns", {
   result <- melt_reports(FIXTURE, "bam_stats")
   expect_s3_class(result, "data.frame")
