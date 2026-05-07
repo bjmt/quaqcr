@@ -161,9 +161,11 @@ description of the command parameters, as well as to see default values,
 call \code{quaqc()} without any arguments.
 }
 \examples{
-\dontrun{
-## To check that you are properly linking to the binary and view help:
-quaqc()
+\donttest{
+if (nzchar(Sys.which("quaqc"))) {
+  ## To check that you are properly linking to the binary and view help:
+  quaqc()
+}
 }
 
 }

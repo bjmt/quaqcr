@@ -87,9 +87,11 @@
 #' output as parsed by \pkg{jsonlite}.
 #'
 #' @examples
-#' \dontrun{
-#' ## To check that you are properly linking to the binary and view help:
-#' quaqc()
+#' \donttest{
+#' if (nzchar(Sys.which("quaqc"))) {
+#'   ## To check that you are properly linking to the binary and view help:
+#'   quaqc()
+#' }
 #' }
 #'
 #' @author Benjamin Jean-Marie Tremblay, \email{benjmtremblay@@gmail.com}

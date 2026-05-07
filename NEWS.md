@@ -1,3 +1,17 @@
+# quaqcr 1.0.2
+
+## CRAN submission preparation
+
+* Added `SystemRequirements: quaqc` to DESCRIPTION.
+* Moved `options(quaqc.bin = ...)` initialisation into `.onLoad()` in `R/zzz.R`.
+* Migrated `inst/CITATION` from deprecated `citEntry()`/`personList()` to
+  `bibentry()`/`c(person(), person())`.
+* Updated `.Rbuildignore` to exclude development files (`CLAUDE.md`, `.claude/`).
+* Removed empty `merge_reports()` stub (`R/merge.R`).
+* Converted `\dontrun{}` to `\donttest{ if (nzchar(Sys.which("quaqc"))) }` in
+  examples for `quaqc()`, `footprint()`, and `pileup()`.
+* Fixed typo `genereal` → `general` in DESCRIPTION.
+
 # quaqcr 1.0.1
 
 ## Bug fixes

@@ -24,9 +24,11 @@
 #' @return A `data.frame` containing read pileup data.
 #'
 #' @examples
-#' \dontrun{
-#' peaks <- system.file("extdata", "peaks.bed.gz", package = "quaqcr")
-#' pileup(peaks, "Sample.bam")
+#' \donttest{
+#' if (nzchar(Sys.which("quaqc"))) {
+#'   peaks <- system.file("extdata", "peaks.bed.gz", package = "quaqcr")
+#'   pileup(peaks, "Sample.bam")
+#' }
 #' }
 #'
 #' @author Benjamin Jean-Marie Tremblay, \email{benjmtremblay@@gmail.com}

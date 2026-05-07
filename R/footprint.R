@@ -21,10 +21,12 @@
 #' @return A `data.frame` containing read pileup data.
 #'
 #' @examples
-#' \dontrun{
-#' TATA_peaks <- system.file("extdata", "tata_p.bed.gz", package = "quaqcr")
-#' TATA_bkg <- system.file("extdata", "tata_n.bed.gz", package = "quaqcr")
-#' footprint(TATA_peaks, "Sample.bam", bkg.motifs = TATA_bkg)
+#' \donttest{
+#' if (nzchar(Sys.which("quaqc"))) {
+#'   TATA_peaks <- system.file("extdata", "tata_p.bed.gz", package = "quaqcr")
+#'   TATA_bkg <- system.file("extdata", "tata_n.bed.gz", package = "quaqcr")
+#'   footprint(TATA_peaks, "Sample.bam", bkg.motifs = TATA_bkg)
+#' }
 #' }
 #'
 #' @author Benjamin Jean-Marie Tremblay, \email{benjmtremblay@@gmail.com}

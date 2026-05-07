@@ -1,6 +1,6 @@
 Package: quaqcr
 Title: Quick ATAC-Seq QC in R
-Version: 1.0.1
+Version: 1.0.2
 Authors@R: 
     person(c("Benjamin", "Jean-Marie"), "Tremblay", role = c("aut", "cre"),
       email = "benjmtremblay@gmail.com",
@@ -13,7 +13,7 @@ Description: A wrapper around the 'quaqc' program. 'quaqc' allows for
     fragment size, percent duplicates, mapq scores, read depth, GC content, and
     others. Although designed for ATAC-seq data, 'quaqc' can also be used for
     other unspliced DNA-seq experiments (such as ChIP-seq) as many of the
-    metrics are related to genereal sequencing quality. This R package also
+    metrics are related to general sequencing quality. This R package also
     provides additional utilities for custom analyses and plotting of 'quaqc'
     results.
 URL: https://github.com/bjmt/quaqcr
@@ -23,6 +23,7 @@ Encoding: UTF-8
 Depends: R (>= 3.6.0)
 Imports: methods, utils, jsonlite
 Roxygen: list(markdown = TRUE, old_usage = TRUE)
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 Suggests: testthat (>= 3.0.0)
 Config/testthat/edition: 3
+SystemRequirements: quaqc (https://github.com/bjmt/quaqc)
