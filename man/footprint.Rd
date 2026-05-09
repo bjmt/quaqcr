@@ -48,12 +48,10 @@ functionality. Target regions can be compared to unbound or background
 regions. (Note that no Tn5 bias correction is applied.)
 }
 \examples{
-\donttest{
-if (nzchar(Sys.which("quaqc"))) {
-  TATA_peaks <- system.file("extdata", "tata_p.bed.gz", package = "quaqcr")
-  TATA_bkg <- system.file("extdata", "tata_n.bed.gz", package = "quaqcr")
-  footprint(TATA_peaks, "Sample.bam", bkg.motifs = TATA_bkg)
-}
+\dontrun{
+TATA_peaks <- system.file("extdata", "tata_p.bed.gz", package = "quaqcr")
+TATA_bkg <- system.file("extdata", "tata_n.bed.gz", package = "quaqcr")
+footprint(TATA_peaks, "Sample.bam", bkg.motifs = TATA_bkg)
 }
 
 }

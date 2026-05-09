@@ -1,3 +1,14 @@
+# quaqcr 1.0.3
+
+## CRAN submission preparation
+
+* Reverted the `footprint()` and `pileup()` examples to `\dontrun{}` because
+  they additionally require a user-supplied BAM file that the user must obtain
+  themselves; the previous `\donttest{}` wrapper caused
+  `R CMD check --run-donttest` to fail. The `quaqc()` example continues to use
+  `\donttest{ if (nzchar(Sys.which("quaqc"))) }`.
+* Added `cran-comments.md` to `.Rbuildignore`.
+
 # quaqcr 1.0.2
 
 ## CRAN submission preparation
