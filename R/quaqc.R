@@ -127,7 +127,7 @@ quaqc <- function(bam.files, mitochondria = NULL, plastids = NULL, peaks = NULL,
 
   if (missing(bam.files)) {
     help <- run_quaqc("-h")
-    cat(help, sep = "\n")
+    message(paste(help, collapse = "\n"))
     return(invisible(help))
   }
 

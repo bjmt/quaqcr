@@ -1,3 +1,17 @@
+# quaqcr 1.0.4
+
+## CRAN submission preparation
+
+* `DESCRIPTION`: removed redundant "in R" from the title.
+* `DESCRIPTION`: expanded acronyms (ATAC-seq, NGS, ChIP-seq) and added a
+  reference to the methods paper in the form
+  `<doi:10.1093/bioinformatics/btae649>`.
+* `quaqc()`: replaced the `cat()` call that printed the program help with a
+  `message()` call so that it can be suppressed by the user.
+* `footprint()` and `pileup()` examples: switched from `\dontrun{}` to a
+  guarded `\donttest{}` that no-ops when the `quaqc` binary or a sample BAM
+  is unavailable.
+
 # quaqcr 1.0.3
 
 ## CRAN submission preparation

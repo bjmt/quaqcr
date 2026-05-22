@@ -44,9 +44,12 @@ enrichment score. This function takes advantage of this feature to
 instead generate read pileups for arbitrary sets of regions.
 }
 \examples{
-\dontrun{
-peaks <- system.file("extdata", "peaks.bed.gz", package = "quaqcr")
-pileup(peaks, "Sample.bam")
+\donttest{
+bam <- "Sample.bam"
+if (nzchar(Sys.which("quaqc")) && file.exists(bam)) {
+  peaks <- system.file("extdata", "peaks.bed.gz", package = "quaqcr")
+  pileup(peaks, bam)
+}
 }
 
 }

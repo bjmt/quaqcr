@@ -5,6 +5,9 @@ quaqcr is an accessory R package for [quaqc](https://github.com/bjmt/quaqc).
 ## Installation
 
 ```R
+install.packages("quaqcr")
+
+# From GitHub instead:
 if (!requireNamespace("remotes")) install.packages("remotes")
 remotes::install_github("bjmt/quaqcr")
 ```
