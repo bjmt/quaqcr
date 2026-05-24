@@ -33,6 +33,18 @@ Released `quaqc` features:
 * `tn5.fwd`, `tn5.rev`: override the global Tn5 shift (default 4 each in
   `quaqc` >= 1.7). Applies to all `*.tn5` options.
 
+## New output readers
+
+* `read_bedgraph()`, `read_bed()`, `read_narrowpeak()`, `read_qscore()`, and
+  `read_quant()` read the corresponding `quaqc` output files into
+  `data.frame`s. The per-sample readers take a `quaqc` (or `quaqc_report`)
+  object and reconstruct the output paths from each sample's BAM filename,
+  with optional `dir`/`ext` overrides that mirror the matching `quaqc()`
+  arguments. `read_bed()` auto-detects BED6 vs BED3 from the run's
+  `bed_ins` parameter. Failed samples are skipped and missing files emit a
+  warning. Reading the filtered BAM output (`--keep`) is intentionally not
+  supported -- use a dedicated BAM-reading package such as `Rsamtools`.
+
 ## Parser updates
 
 * `parse_quaqc()` now extracts every `quaqc_params` key emitted by `quaqc`
