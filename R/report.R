@@ -71,19 +71,30 @@ parse_quaqc <- function(json.text) {
     # runtime = as.integer(difftime(json$quaqc_time_end, json$quaqc_time_start, units = "secs")),
     # memory = json$quaqc_max_bytes,
   )
-  params.nume <- unlist(json$quaqc_params[c(
-      "target_seqs_n", "peak_bed_n", "tss_bed_n", "target_list_bed_n",
-      "blacklist_bed_n", "read_groups_n", "mapq_min", "alignment_size_min",
-      "alignment_size_max", "fragment_size_min", "fragment_size_max",
-      "alignment_histogram_max", "fragment_histogram_max",
-      "depth_histogram_max", "tss_histogram_size",
-      "tss_read_size"
-  )])
-  params.logi <- unlist(json$quaqc_params[c(
+  nume.keys <- c(
+    "target_seqs_n", "peak_bed_n", "tss_bed_n", "target_list_bed_n",
+    "blacklist_bed_n", "read_groups_n", "mapq_min", "alignment_size_min",
+    "alignment_size_max", "fragment_size_min", "fragment_size_max",
+    "alignment_histogram_max", "fragment_histogram_max",
+    "depth_histogram_max", "tss_histogram_size", "tss_read_size",
+    "bedGraph_qlen", "tn5_fwd", "tn5_rev", "threads_n"
+  )
+  logi.keys <- c(
     "tss_tn5_shift", "use_secondary_alignments", "use_supplementary_alignments",
-    "use_improper_mates", "use_duplicates", "no_se", "use_dovetails", "use_all"
-  )])
-  reports <- lapply(json$quaqc_reports, function(x) parse_single_report(x, params.nume, params.logi))
+    "use_improper_mates", "use_duplicates", "no_se", "use_dovetails", "use_all",
+    "bedGraph", "bedGraph_tn5", "bed", "bed_ins", "bed_tn5",
+    "quant_ins", "quant_tn5", "quant_pn",
+    "no_quaqc_reports", "save_as_json", "omit_gc_stats", "omit_depth_stats",
+    "fast_mode", "low_mem_mode", "lenient_mode", "strict_mode",
+    "nfr_mode", "nbr_mode", "footprint_mode", "chip_mode",
+    "quit_on_sample_error", "verbose", "very_verbose"
+  )
+  char.keys <- c("read_groups_tag", "quant")
+  params.nume <- unlist(json$quaqc_params[intersect(nume.keys, names(json$quaqc_params))])
+  params.logi <- unlist(json$quaqc_params[intersect(logi.keys, names(json$quaqc_params))])
+  params.char <- unlist(json$quaqc_params[intersect(char.keys, names(json$quaqc_params))])
+  reports <- lapply(json$quaqc_reports,
+    function(x) parse_single_report(x, params.nume, params.logi, params.char))
   structure(list(metadata = meta, reports = reports), class = "quaqc")
 }
 
@@ -100,12 +111,12 @@ parse_quaqc_file <- function(json.file) {
   parse_quaqc(json)
 }
 
-parse_single_report <- function(report, params.nume, params.logi) {
+parse_single_report <- function(report, params.nume, params.logi, params.char = character()) {
   if (!report$status_success) {
     structure(list(
       sample = report$sample,
       success = FALSE,
-      params = list(integer = params.nume, boolean = params.logi),
+      params = list(integer = params.nume, boolean = params.logi, character = params.char),
       genome = NULL,
       unfiltered = NULL,
       filtered = NULL
@@ -211,7 +222,7 @@ parse_single_report <- function(report, params.nume, params.logi) {
       nuclear = nuclear
     )
     structure(list(sample = sample, success = TRUE,
-      params = list(integer = params.nume, boolean = params.logi),
+      params = list(integer = params.nume, boolean = params.logi, character = params.char),
       genome = genome, unfiltered = unfiltered,
       filtered = filtered), class = c("quaqc_report"))
   }
@@ -222,16 +233,30 @@ identical_params <- function(x, y) {
     stop("'x' and 'y' must be 'quaqc_report' objects")
   if (!validate_quaqc_report(x) || !validate_quaqc_report(y))
     warning("'quaqc_report' object(s) may be invalid", call. = FALSE, immediate. = TRUE)
+  x.char <- if (is.null(x$params$character)) character() else x$params$character
+  y.char <- if (is.null(y$params$character)) character() else y$params$character
+  same.char <- identical(x.char, y.char)
   if (any(x$params$integer != y$params$integer) ||
-      any(x$params$boolean != y$params$boolean)) {
+      any(x$params$boolean != y$params$boolean) ||
+      !same.char) {
     int_i <- which(x$params$integer != y$params$integer)
     int_b <- which(x$params$boolean != y$params$boolean)
-    if (length(int_i) + length(int_b)) message("Found the following differences:")
+    int_c <- if (same.char) integer() else seq_along(union(names(x.char), names(y.char)))
+    if (length(int_i) + length(int_b) + length(int_c))
+      message("Found the following differences:")
     for (i in int_i) {
       message("  ", names(x$params$integer)[i], ": x=", x$params$integer[i], " y=", y$params$integer[i])
     }
     for (i in int_b) {
       message("  ", names(x$params$boolean)[i], ": x=", x$params$boolean[i], " y=", y$params$boolean[i])
+    }
+    if (!same.char) {
+      char.names <- union(names(x.char), names(y.char))
+      for (n in char.names) {
+        xv <- if (is.null(x.char[[n]])) "(missing)" else x.char[[n]]
+        yv <- if (is.null(y.char[[n]])) "(missing)" else y.char[[n]]
+        if (!identical(xv, yv)) message("  ", n, ": x=", xv, " y=", yv)
+      }
     }
     FALSE
   } else {

@@ -1,3 +1,59 @@
+# quaqcr 1.1.0
+
+`quaqcr` now wraps the full CLI surface of `quaqc` releases up to and
+including the current development version, while remaining compatible with
+every `quaqc` release back to 1.1. No minimum `quaqc` version is enforced;
+passing a flag to a `quaqc` binary that does not yet support it will cause
+`quaqc` itself to error.
+
+## New `quaqc()` arguments
+
+Released `quaqc` features:
+
+* `rg.tag`: filter reads using an alternate SAM tag (e.g. cell barcode `"CB"`)
+  instead of the RG tag. Requires `quaqc` >= 1.3.
+* `bedgraph`, `bedgraph.qlen`, `bedgraph.tn5`, `bedgraph.dir`, `bedgraph.ext`:
+  per-sample gzipped read-density bedGraph output. Requires `quaqc` >= 1.2.
+* `bed`, `bed.ins`, `bed.tn5`, `bed.dir`, `bed.ext`: per-sample gzipped BED6
+  (or BED3 of 5' insertions) output. Requires `quaqc` >= 1.4 (`bed.tn5`
+  requires `quaqc` >= 1.5).
+* `quant`, `quant.ins`, `quant.tn5`, `quant.pn`: write a per-peak read-count
+  TSV alongside the JSON report. Requires `quaqc` >= 1.5.
+
+`quaqc` >= 1.7 features:
+
+* `call.peaks`: enable MACS3-style, no-control peak calling. Writes a
+  per-sample `narrowPeak.gz` file and (when `peaks` is not also supplied)
+  drives the FRIP value in the JSON report.
+* Peak-calling tuning: `peaks.extsize`, `peaks.llocal`, `peaks.qval`,
+  `peaks.gsize`, `peaks.min.len`, `peaks.max.gap`, `peaks.split`,
+  `peaks.qscore`, `peaks.dir`, `peaks.ext`, `qscore.ext`. Numeric args
+  (`peaks.qval`, `peaks.gsize`, `peaks.split`) accept floats including
+  scientific notation (e.g. `peaks.gsize = 1.2e8`).
+* `tn5.fwd`, `tn5.rev`: override the global Tn5 shift (default 4 each in
+  `quaqc` >= 1.7). Applies to all `*.tn5` options.
+
+## Parser updates
+
+* `parse_quaqc()` now extracts every `quaqc_params` key emitted by `quaqc`
+  releases 1.2-1.6 and the current development version, including the
+  `--bedGraph`/`--bed`/`--quant`/`--rg-tag`/`--tn5-fwd`/`--tn5-rev` settings
+  and the various `*_mode` preset booleans. Missing keys (e.g. when parsing
+  reports from older `quaqc` releases) are silently skipped.
+* `quaqc_report$params` gained a `character` slot for string-valued params
+  (currently `read_groups_tag` and `quant`); the `integer` and `boolean` slots
+  are unchanged.
+* `melt_reports(report, "peak_stats")` now includes a `Called` column
+  reflecting the new `peaks$called` boolean emitted by `quaqc` when
+  `--call-peaks` is supported (`NA` for older `quaqc` releases).
+
+## Bug fixes
+
+* `quaqc()`: the `tss.tn5` parameter documentation said "+4/-5"; the actual
+  shift is "+4/-4" in `quaqc` >= 1.7 (and the older "+4/-5" is unchanged in
+  earlier `quaqc` versions). Doc updated to point at the new `tn5.fwd`/
+  `tn5.rev` overrides.
+
 # quaqcr 1.0.4
 
 ## CRAN submission preparation

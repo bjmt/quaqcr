@@ -23,7 +23,7 @@ test_that("the fixture quaqc_report is successful and has all sub-structures", {
   expect_true(is.matrix(rep$genome))
   expect_true(is.matrix(rep$unfiltered$effective))
   expect_s3_class(rep$filtered$nuclear$stats, "data.frame")
-  expect_named(rep$params, c("integer", "boolean"))
+  expect_named(rep$params, c("integer", "boolean", "character"))
 })
 
 test_that("parse_quaqc errors on a non-list input", {

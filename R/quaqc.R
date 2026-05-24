@@ -27,6 +27,9 @@
 #' `quaqc`.
 #' @param rg.list Filename of a text file containing read group (RG) names to
 #' restrict `quaqc`, one name per line.
+#' @param rg.tag Character, alternate SAM tag to match `rg.names`/`rg.list`
+#' against instead of the RG tag (e.g. `"CB"` for cell barcodes). Requires
+#' `quaqc` >= 1.3.
 #' @param use.secondary Logical, allow secondary alignments.
 #' @param use.nomate Logical, allow PE reads when the mate does not align
 #' properly.
@@ -45,7 +48,9 @@
 #' @param max.fhist Integer, max fragment length for histogram.
 #' @param tss.size Integer, size of the TSS region for pileup.
 #' @param tss.qlen Integer, resize reads (centered on the 5-prime end for pileup.
-#' @param tss.tn5 Logical, shift 5-prime end coordinates +4/-5 bases for pileup.
+#' @param tss.tn5 Logical, shift 5-prime end coordinates +4/-4 bases for pileup
+#' (was +4/-5 in `quaqc` <= 1.6). The shift can be customised via `tn5.fwd` and
+#' `tn5.rev` in `quaqc` >= 1.7.
 #' @param omit.gc Logical, omit calculation of read GC content.
 #' @param omit.depth Logical, omit calculation of read depths.
 #' @param fast Logical, turn on fast mode.
@@ -65,6 +70,65 @@
 #' @param keep Logical, save passing nuclear reads to a new BAM file.
 #' @param keep.dir Directory name to save filtered BAMs.
 #' @param keep.ext Extension of filtered BAMs.
+#' @param bedgraph Logical, output a gzipped read density bedGraph per sample.
+#' Requires `quaqc` >= 1.2. As of `quaqc` >= 1.7 the file is BGZF (block-gzip)
+#' and so is tabix-indexable, but still readable with `gzip -dc`/`zcat`.
+#' @param bedgraph.qlen Integer, resize reads (centered on the 5-prime end)
+#' for the bedGraph. Requires `quaqc` >= 1.2.
+#' @param bedgraph.tn5 Logical, shift 5-prime end coordinates by the Tn5
+#' offset (default +4/-4) for the bedGraph. Requires `quaqc` >= 1.2.
+#' @param bedgraph.dir Directory in which to write bedGraphs if not that of
+#' the input BAM.
+#' @param bedgraph.ext Filename extension for bedGraph output files.
+#' @param bed Logical, output a gzipped BED6 of passing reads per sample.
+#' Requires `quaqc` >= 1.4. As of `quaqc` >= 1.7 the file is BGZF, but still
+#' readable with `gzip -dc`/`zcat`.
+#' @param bed.ins Logical, write 5-prime insertion coordinates in BED3 instead
+#' of full-length alignments. Requires `quaqc` >= 1.4.
+#' @param bed.tn5 Logical, adjust BED coordinates for the Tn5 shift. Requires
+#' `quaqc` >= 1.5.
+#' @param bed.dir Directory in which to write BED files if not that of the
+#' input BAM.
+#' @param bed.ext Filename extension for BED output files.
+#' @param quant File path to write a TSV of per-peak read counts (rows: peaks,
+#' columns: samples). Requires `quaqc` >= 1.5. The peaks themselves are
+#' supplied via `peaks`.
+#' @param quant.ins Logical, quantify based on 5-prime insertion coordinates
+#' instead of full alignments. Requires `quaqc` >= 1.5.
+#' @param quant.tn5 Logical, adjust quantification coordinates for the Tn5
+#' shift. Requires `quaqc` >= 1.5.
+#' @param quant.pn Logical, use pretty (basename) sample names in the
+#' quantification TSV header. Requires `quaqc` >= 1.5.
+#' @param call.peaks Logical, perform MACS3-style, no-control peak calling
+#' and write a per-sample `narrowPeak.gz` file. When `peaks` is not also
+#' supplied, the called peaks drive the FRIP value in the JSON report.
+#' Requires `quaqc` >= 1.7.
+#' @param peaks.extsize Integer, Tn5 insertion extension window for peak
+#' calling (default 150). Requires `quaqc` >= 1.7.
+#' @param peaks.llocal Integer, large local lambda window size for peak
+#' calling (default 10000). Requires `quaqc` >= 1.7.
+#' @param peaks.qval Numeric, q-value (FDR) cutoff for peak calling (default
+#' 0.05). Requires `quaqc` >= 1.7.
+#' @param peaks.gsize Numeric, effective genome size used for the local
+#' lambda and Benjamini-Hochberg correction (e.g. `1.2e8`). Defaults to the
+#' effective nuclear genome size computed by `quaqc`. Requires `quaqc` >= 1.7.
+#' @param peaks.min.len Integer, minimum peak length (defaults to
+#' `peaks.extsize`). Requires `quaqc` >= 1.7.
+#' @param peaks.max.gap Integer, maximum gap between adjacent passing
+#' segments to merge into a single peak (default 1). Requires `quaqc` >= 1.7.
+#' @param peaks.split Numeric in (0, 1), enable splitting of multi-modal
+#' peaks at valleys whose pileup is less than `peaks.split` times the lower
+#' adjacent summit. Off by default. Requires `quaqc` >= 1.7.
+#' @param peaks.qscore Logical, also write a per-sample -log10(q) bedGraph
+#' track. Requires `quaqc` >= 1.7.
+#' @param peaks.dir Output directory for peak files.
+#' @param peaks.ext Filename extension for the narrowPeak output.
+#' @param qscore.ext Filename extension for the qscore bedGraph output.
+#' @param tn5.fwd Integer, override the global Tn5 shift for forward reads
+#' (default 4). Affects every `*.tn5` option. Requires `quaqc` >= 1.7.
+#' @param tn5.rev Integer, override the global Tn5 shift for reverse reads
+#' (default 4 in `quaqc` >= 1.7; was effectively 5 in earlier versions).
+#' Requires `quaqc` >= 1.7.
 #' @param threads Integer, number of worker threads. Max one per sample.
 #' @param title Assign a title to run.
 #' @param continue Logical, do not return an error and instead continue running
@@ -99,7 +163,8 @@
 #' @export
 quaqc <- function(bam.files, mitochondria = NULL, plastids = NULL, peaks = NULL,
   tss = NULL, target.names = NULL, target.list = NULL, blacklist = NULL,
-  rg.names = NULL, rg.list = NULL, use.secondary = FALSE, use.nomate = FALSE,
+  rg.names = NULL, rg.list = NULL, rg.tag = NULL,
+  use.secondary = FALSE, use.nomate = FALSE,
   use.dups = FALSE, use.chimeric = FALSE, use.dovetails = FALSE, no.se = FALSE,
   mapq = NULL, min.qlen = NULL, min.flen = NULL, max.qlen = NULL,
   max.flen = NULL, use.all = FALSE, max.depth = NULL, max.qhist = NULL,
@@ -107,7 +172,18 @@ quaqc <- function(bam.files, mitochondria = NULL, plastids = NULL, peaks = NULL,
   omit.gc = FALSE, omit.depth = FALSE, fast = FALSE, lenient = FALSE, strict = FALSE,
   nfr = FALSE, nbr = FALSE, footprint = FALSE, chip = FALSE, output.dir = NULL,
   output.ext = NULL, no.output = TRUE, json = "-", keep = FALSE,
-  keep.dir = NULL, keep.ext = NULL, threads = NULL, title = NULL, continue = FALSE,
+  keep.dir = NULL, keep.ext = NULL,
+  bedgraph = FALSE, bedgraph.qlen = NULL, bedgraph.tn5 = FALSE,
+  bedgraph.dir = NULL, bedgraph.ext = NULL,
+  bed = FALSE, bed.ins = FALSE, bed.tn5 = FALSE,
+  bed.dir = NULL, bed.ext = NULL,
+  quant = NULL, quant.ins = FALSE, quant.tn5 = FALSE, quant.pn = FALSE,
+  call.peaks = FALSE, peaks.extsize = NULL, peaks.llocal = NULL,
+  peaks.qval = NULL, peaks.gsize = NULL, peaks.min.len = NULL,
+  peaks.max.gap = NULL, peaks.split = NULL, peaks.qscore = FALSE,
+  peaks.dir = NULL, peaks.ext = NULL, qscore.ext = NULL,
+  tn5.fwd = NULL, tn5.rev = NULL,
+  threads = NULL, title = NULL, continue = FALSE,
   verbose = 1, timeout = 0, env = character(), stderr.file = "",
   bin = getOption("quaqc.bin")) {
 
@@ -218,6 +294,16 @@ quaqc <- function(bam.files, mitochondria = NULL, plastids = NULL, peaks = NULL,
   if (no.output) args <- c("--no-output", args)
   if (keep) args <- c("--keep", args)
   if (continue) args <- c("--continue", args)
+  if (bedgraph) args <- c("--bedGraph", args)
+  if (bedgraph.tn5) args <- c("--bedGraph-tn5", args)
+  if (bed) args <- c("--bed", args)
+  if (bed.ins) args <- c("--bed-ins", args)
+  if (bed.tn5) args <- c("--bed-tn5", args)
+  if (quant.ins) args <- c("--quant-ins", args)
+  if (quant.tn5) args <- c("--quant-tn5", args)
+  if (quant.pn) args <- c("--quant-pn", args)
+  if (call.peaks) args <- c("--call-peaks", args)
+  if (peaks.qscore) args <- c("--peaks-qscore", args)
 
   # Character args
 
@@ -226,10 +312,19 @@ quaqc <- function(bam.files, mitochondria = NULL, plastids = NULL, peaks = NULL,
   if (!is.null(target.names)) args <- c("--target-names", paste0(target.names, collapse = ","), args)
   if (!is.null(rg.names)) args <- c("--rg-names", paste0(rg.names, collapse = ","), args)
   if (!is.null(rg.list)) args <- c("--rg-list", normalizePath(path.expand(rg.list), mustWork = TRUE)[1], args)
+  if (!is.null(rg.tag)) args <- c("--rg-tag", as.character(rg.tag)[1], args)
   if (!is.null(output.dir)) args <- c("--output-dir", normalizePath(path.expand(output.dir), mustWork = TRUE)[1], args)
   if (!is.null(output.ext)) args <- c("--output-ext", output.ext[1], args)
   if (!is.null(keep.dir)) args <- c("--keep-dir", normalizePath(path.expand(keep.dir), mustWork = TRUE)[1], args)
   if (!is.null(keep.ext)) args <- c("--keep-ext", keep.ext[1], args)
+  if (!is.null(bedgraph.dir)) args <- c("--bedGraph-dir", normalizePath(path.expand(bedgraph.dir), mustWork = TRUE)[1], args)
+  if (!is.null(bedgraph.ext)) args <- c("--bedGraph-ext", bedgraph.ext[1], args)
+  if (!is.null(bed.dir)) args <- c("--bed-dir", normalizePath(path.expand(bed.dir), mustWork = TRUE)[1], args)
+  if (!is.null(bed.ext)) args <- c("--bed-ext", bed.ext[1], args)
+  if (!is.null(quant)) args <- c("--quant", path.expand(as.character(quant)[1]), args)
+  if (!is.null(peaks.dir)) args <- c("--peaks-dir", normalizePath(path.expand(peaks.dir), mustWork = TRUE)[1], args)
+  if (!is.null(peaks.ext)) args <- c("--peaks-ext", peaks.ext[1], args)
+  if (!is.null(qscore.ext)) args <- c("--qscore-ext", qscore.ext[1], args)
   if (!is.null(title)) args <- c("--title", paste0(title, collapse = " "), args)
 
   isPiped <- FALSE
@@ -251,7 +346,21 @@ quaqc <- function(bam.files, mitochondria = NULL, plastids = NULL, peaks = NULL,
   if (!is.null(max.fhist)) args <- c("--max-fhist", as.integer(max.fhist)[1], args)
   if (!is.null(tss.size)) args <- c("--tss-size", as.integer(tss.size)[1], args)
   if (!is.null(tss.qlen)) args <- c("--tss-qlen", as.integer(tss.qlen)[1], args)
+  if (!is.null(bedgraph.qlen)) args <- c("--bedGraph-qlen", as.integer(bedgraph.qlen)[1], args)
+  if (!is.null(peaks.extsize)) args <- c("--peaks-extsize", as.integer(peaks.extsize)[1], args)
+  if (!is.null(peaks.llocal)) args <- c("--peaks-llocal", as.integer(peaks.llocal)[1], args)
+  if (!is.null(peaks.min.len)) args <- c("--peaks-min-len", as.integer(peaks.min.len)[1], args)
+  if (!is.null(peaks.max.gap)) args <- c("--peaks-max-gap", as.integer(peaks.max.gap)[1], args)
+  if (!is.null(tn5.fwd)) args <- c("--tn5-fwd", as.integer(tn5.fwd)[1], args)
+  if (!is.null(tn5.rev)) args <- c("--tn5-rev", as.integer(tn5.rev)[1], args)
   if (!is.null(threads)) args <- c("--threads", as.integer(threads)[1], args)
+
+  # Numeric args (floats; format to preserve scientific notation for e.g. 1.2e8)
+
+  fmtnum <- function(x) format(as.numeric(x)[1], scientific = FALSE, trim = TRUE)
+  if (!is.null(peaks.qval)) args <- c("--peaks-qval", fmtnum(peaks.qval), args)
+  if (!is.null(peaks.gsize)) args <- c("--peaks-gsize", fmtnum(peaks.gsize), args)
+  if (!is.null(peaks.split)) args <- c("--peaks-split", fmtnum(peaks.split), args)
 
   # Program args
 

@@ -6,7 +6,7 @@
 \usage{
 quaqc(bam.files, mitochondria = NULL, plastids = NULL, peaks = NULL,
   tss = NULL, target.names = NULL, target.list = NULL,
-  blacklist = NULL, rg.names = NULL, rg.list = NULL,
+  blacklist = NULL, rg.names = NULL, rg.list = NULL, rg.tag = NULL,
   use.secondary = FALSE, use.nomate = FALSE, use.dups = FALSE,
   use.chimeric = FALSE, use.dovetails = FALSE, no.se = FALSE,
   mapq = NULL, min.qlen = NULL, min.flen = NULL, max.qlen = NULL,
@@ -16,9 +16,17 @@ quaqc(bam.files, mitochondria = NULL, plastids = NULL, peaks = NULL,
   strict = FALSE, nfr = FALSE, nbr = FALSE, footprint = FALSE,
   chip = FALSE, output.dir = NULL, output.ext = NULL, no.output = TRUE,
   json = "-", keep = FALSE, keep.dir = NULL, keep.ext = NULL,
-  threads = NULL, title = NULL, continue = FALSE, verbose = 1,
-  timeout = 0, env = character(), stderr.file = "",
-  bin = getOption("quaqc.bin"))
+  bedgraph = FALSE, bedgraph.qlen = NULL, bedgraph.tn5 = FALSE,
+  bedgraph.dir = NULL, bedgraph.ext = NULL, bed = FALSE,
+  bed.ins = FALSE, bed.tn5 = FALSE, bed.dir = NULL, bed.ext = NULL,
+  quant = NULL, quant.ins = FALSE, quant.tn5 = FALSE, quant.pn = FALSE,
+  call.peaks = FALSE, peaks.extsize = NULL, peaks.llocal = NULL,
+  peaks.qval = NULL, peaks.gsize = NULL, peaks.min.len = NULL,
+  peaks.max.gap = NULL, peaks.split = NULL, peaks.qscore = FALSE,
+  peaks.dir = NULL, peaks.ext = NULL, qscore.ext = NULL,
+  tn5.fwd = NULL, tn5.rev = NULL, threads = NULL, title = NULL,
+  continue = FALSE, verbose = 1, timeout = 0, env = character(),
+  stderr.file = "", bin = getOption("quaqc.bin"))
 }
 \arguments{
 \item{bam.files}{Character vector of BAM file names. Must be coordinate
@@ -51,6 +59,10 @@ package.}
 
 \item{rg.list}{Filename of a text file containing read group (RG) names to
 restrict \code{quaqc}, one name per line.}
+
+\item{rg.tag}{Character, alternate SAM tag to match \code{rg.names}/\code{rg.list}
+against instead of the RG tag (e.g. \code{"CB"} for cell barcodes). Requires
+\code{quaqc} >= 1.3.}
 
 \item{use.secondary}{Logical, allow secondary alignments.}
 
@@ -87,7 +99,9 @@ properly.}
 
 \item{tss.qlen}{Integer, resize reads (centered on the 5-prime end for pileup.}
 
-\item{tss.tn5}{Logical, shift 5-prime end coordinates +4/-5 bases for pileup.}
+\item{tss.tn5}{Logical, shift 5-prime end coordinates +4/-4 bases for pileup
+(was +4/-5 in \code{quaqc} <= 1.6). The shift can be customised via \code{tn5.fwd} and
+\code{tn5.rev} in \code{quaqc} >= 1.7.}
 
 \item{omit.gc}{Logical, omit calculation of read GC content.}
 
@@ -123,6 +137,93 @@ R and not save to a file.}
 \item{keep.dir}{Directory name to save filtered BAMs.}
 
 \item{keep.ext}{Extension of filtered BAMs.}
+
+\item{bedgraph}{Logical, output a gzipped read density bedGraph per sample.
+Requires \code{quaqc} >= 1.2. As of \code{quaqc} >= 1.7 the file is BGZF (block-gzip)
+and so is tabix-indexable, but still readable with \code{gzip -dc}/\code{zcat}.}
+
+\item{bedgraph.qlen}{Integer, resize reads (centered on the 5-prime end)
+for the bedGraph. Requires \code{quaqc} >= 1.2.}
+
+\item{bedgraph.tn5}{Logical, shift 5-prime end coordinates by the Tn5
+offset (default +4/-4) for the bedGraph. Requires \code{quaqc} >= 1.2.}
+
+\item{bedgraph.dir}{Directory in which to write bedGraphs if not that of
+the input BAM.}
+
+\item{bedgraph.ext}{Filename extension for bedGraph output files.}
+
+\item{bed}{Logical, output a gzipped BED6 of passing reads per sample.
+Requires \code{quaqc} >= 1.4. As of \code{quaqc} >= 1.7 the file is BGZF, but still
+readable with \code{gzip -dc}/\code{zcat}.}
+
+\item{bed.ins}{Logical, write 5-prime insertion coordinates in BED3 instead
+of full-length alignments. Requires \code{quaqc} >= 1.4.}
+
+\item{bed.tn5}{Logical, adjust BED coordinates for the Tn5 shift. Requires
+\code{quaqc} >= 1.5.}
+
+\item{bed.dir}{Directory in which to write BED files if not that of the
+input BAM.}
+
+\item{bed.ext}{Filename extension for BED output files.}
+
+\item{quant}{File path to write a TSV of per-peak read counts (rows: peaks,
+columns: samples). Requires \code{quaqc} >= 1.5. The peaks themselves are
+supplied via \code{peaks}.}
+
+\item{quant.ins}{Logical, quantify based on 5-prime insertion coordinates
+instead of full alignments. Requires \code{quaqc} >= 1.5.}
+
+\item{quant.tn5}{Logical, adjust quantification coordinates for the Tn5
+shift. Requires \code{quaqc} >= 1.5.}
+
+\item{quant.pn}{Logical, use pretty (basename) sample names in the
+quantification TSV header. Requires \code{quaqc} >= 1.5.}
+
+\item{call.peaks}{Logical, perform MACS3-style, no-control peak calling
+and write a per-sample \code{narrowPeak.gz} file. When \code{peaks} is not also
+supplied, the called peaks drive the FRIP value in the JSON report.
+Requires \code{quaqc} >= 1.7.}
+
+\item{peaks.extsize}{Integer, Tn5 insertion extension window for peak
+calling (default 150). Requires \code{quaqc} >= 1.7.}
+
+\item{peaks.llocal}{Integer, large local lambda window size for peak
+calling (default 10000). Requires \code{quaqc} >= 1.7.}
+
+\item{peaks.qval}{Numeric, q-value (FDR) cutoff for peak calling (default
+0.05). Requires \code{quaqc} >= 1.7.}
+
+\item{peaks.gsize}{Numeric, effective genome size used for the local
+lambda and Benjamini-Hochberg correction (e.g. \code{1.2e8}). Defaults to the
+effective nuclear genome size computed by \code{quaqc}. Requires \code{quaqc} >= 1.7.}
+
+\item{peaks.min.len}{Integer, minimum peak length (defaults to
+\code{peaks.extsize}). Requires \code{quaqc} >= 1.7.}
+
+\item{peaks.max.gap}{Integer, maximum gap between adjacent passing
+segments to merge into a single peak (default 1). Requires \code{quaqc} >= 1.7.}
+
+\item{peaks.split}{Numeric in (0, 1), enable splitting of multi-modal
+peaks at valleys whose pileup is less than \code{peaks.split} times the lower
+adjacent summit. Off by default. Requires \code{quaqc} >= 1.7.}
+
+\item{peaks.qscore}{Logical, also write a per-sample -log10(q) bedGraph
+track. Requires \code{quaqc} >= 1.7.}
+
+\item{peaks.dir}{Output directory for peak files.}
+
+\item{peaks.ext}{Filename extension for the narrowPeak output.}
+
+\item{qscore.ext}{Filename extension for the qscore bedGraph output.}
+
+\item{tn5.fwd}{Integer, override the global Tn5 shift for forward reads
+(default 4). Affects every \verb{*.tn5} option. Requires \code{quaqc} >= 1.7.}
+
+\item{tn5.rev}{Integer, override the global Tn5 shift for reverse reads
+(default 4 in \code{quaqc} >= 1.7; was effectively 5 in earlier versions).
+Requires \code{quaqc} >= 1.7.}
 
 \item{threads}{Integer, number of worker threads. Max one per sample.}
 

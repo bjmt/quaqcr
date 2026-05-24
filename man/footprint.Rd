@@ -29,7 +29,9 @@ number of reads per window.}
 
 \item{tss.qlen}{Integer, resize reads (centered on the 5-prime end for pileup.}
 
-\item{tss.tn5}{Logical, shift 5-prime end coordinates +4/-5 bases for pileup.}
+\item{tss.tn5}{Logical, shift 5-prime end coordinates +4/-4 bases for pileup
+(was +4/-5 in \code{quaqc} <= 1.6). The shift can be customised via \code{tn5.fwd} and
+\code{tn5.rev} in \code{quaqc} >= 1.7.}
 
 \item{nfr}{Logical, turn on NFR mode.}
 

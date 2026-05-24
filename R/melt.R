@@ -205,15 +205,18 @@ get_peak_stats <- function(r, sn) {
   nRow <- 1
   o <- data.frame(row.names = NULL,
     Sample = rep(sn, each = nRow),
+    Called = NA,
     PeakCount = NA,
     PeakGenomeCov = NA,
     FRIP = NA
   )
   for (i in seq_along(r)) {
     i_i <- (1:nRow) + nRow * (i - 1)
-    o$PeakCount[i_i] <- r[[i]]$filtered$nuclear$peaks["n"]
-    o$PeakGenomeCov[i_i] <- r[[i]]$filtered$nuclear$peaks["coverage"]
-    o$FRIP[i_i] <- r[[i]]$filtered$nuclear$peaks["fraction_of_reads_in_peaks"]
+    pk <- r[[i]]$filtered$nuclear$peaks
+    o$Called[i_i] <- if ("called" %in% names(pk)) as.logical(pk["called"]) else NA
+    o$PeakCount[i_i] <- pk["n"]
+    o$PeakGenomeCov[i_i] <- pk["coverage"]
+    o$FRIP[i_i] <- pk["fraction_of_reads_in_peaks"]
   }
   o
 }

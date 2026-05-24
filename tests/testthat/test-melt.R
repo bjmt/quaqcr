@@ -61,7 +61,7 @@ test_that("nucl_addn section returns expected columns", {
 test_that("peak_stats section returns expected columns", {
   result <- melt_reports(FIXTURE, "peak_stats")
   expect_s3_class(result, "data.frame")
-  expect_named(result, c("Sample", "PeakCount", "PeakGenomeCov", "FRIP"))
+  expect_named(result, c("Sample", "Called", "PeakCount", "PeakGenomeCov", "FRIP"))
 })
 
 test_that("tss_stats section returns expected columns", {
