@@ -5,6 +5,7 @@ quaqcr is an accessory R package for [quaqc](https://github.com/bjmt/quaqc).
 ## Installation
 
 ```R
+# Install from CRAN:
 install.packages("quaqcr")
 
 # From GitHub instead:
